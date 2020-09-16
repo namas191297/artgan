@@ -9,8 +9,7 @@ from model.training import train_and_validate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', type=str, default='experiments/base_model/', help='Experiment directory containing params.json')
-# FIXME default path for the dataset
-parser.add_argument('--data_dir', type=str, default='../../Cat-Dog-data/', help='Directory containing the dataset')
+parser.add_argument('--data_dir', type=str, default='../../../Dataset/ArtNet/', help='Directory containing the dataset')
 parser.add_argument('--restore_from', type=str, default=None, help='Optional, directory or file containing weights to reload before training')
 
 
@@ -38,8 +37,8 @@ def main():
 
   logging.info("Creating input pipelines...")
 
-  data_pipelines = fetch_pipeline(['training', 'validation'], args.data_dir, params)
-  train_pipeline = data_pipelines['training']
+  data_pipelines = fetch_pipeline(['train', 'validation'], args.data_dir, params)
+  train_pipeline = data_pipelines['train']
   logging.info("Completed (Training Dataset)!")
   valid_pipeline = data_pipelines['validation']
   logging.info("Completed (Validation Dataset)!")

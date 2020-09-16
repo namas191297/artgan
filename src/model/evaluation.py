@@ -5,7 +5,6 @@ import torch
 from tqdm import tqdm
 
 from model.utils import save_dict_to_json
-from model.model_structure import RunningAverage
 
 
 def evaluate_session(model_spec, pipeline, params):
@@ -30,8 +29,8 @@ def evaluate_session(model_spec, pipeline, params):
   with torch.no_grad():
     with tqdm(total=len(pipeline)) as t:
       for batch_X, batch_y in pipeline:
-    # FIXME create the content of the loop. This will count for every batch iteration
-
+        # FIXME create the content of the loop. This will count for every batch iteration
+        pass
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
   logging.info("- Evaluation metrics: " + metrics_string)

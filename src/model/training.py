@@ -4,7 +4,6 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
 from model.utils import save_dict_to_json
 

@@ -31,6 +31,6 @@ def model_fn(params):
 
   # TODO important create a dictionary with all the model specs and carry this across our code modules
   # create a bundle that contains all the necessary components of the model
-  model_spec = {'net_model': model, 'loss_fn': loss_fn, 'optimiser': optimiser, 'metrics': {'accuracy': accuracy}}
+  model_spec = {'net_model': model, 'loss_fn': loss_fn, 'optimiser': optimiser, 'metrics': {'accuracy': None}}
 
   return model_spec

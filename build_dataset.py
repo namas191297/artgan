@@ -4,8 +4,8 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 
 '''
-Before run the script make sure that you have the correct file structure, as given below, to avoid path errors. These folders must exist in advance,
-as of this version of the code.
+Before run the script make sure that you have the correct file structure, as given below, to avoid path errors.
+These folders must exist in advance, as of this version of the code.
 
 -Project folder (name won't matter here)
   - code/build_dataset.py
@@ -20,7 +20,7 @@ as of this version of the code.
     - test
     - validation
 '''
-parent_path = '../../Dataset/'
+parent_path = '../../../Dataset/'
 cezanne_path = os.path.join(parent_path, 'cezanne2photo')
 vangogh_path = os.path.join(parent_path, 'vangogh2photo')
 monet_path = os.path.join(parent_path, 'monet2photo')

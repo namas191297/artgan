@@ -37,19 +37,19 @@ def main():
 
   logging.info("Creating input pipelines...")
 
-  data_pipelines = fetch_pipeline(['train', 'validation'], args.data_dir, params)
-  train_pipeline = data_pipelines['train']
+  data_pipelines = fetch_pipeline(['training', 'validation'], args.data_dir, params)
+  train_pipeline = data_pipelines['training']
   logging.info("Completed (Training Dataset)!")
   valid_pipeline = data_pipelines['validation']
   logging.info("Completed (Validation Dataset)!")
 
-  # logging.info("Building network model...")
-  # model_spec = model_fn(params)
-  # logging.info("Building completed!")
-  #
-  # logging.info("Initiate training procedure!")
-  # train_and_validate(model_spec, train_pipeline, valid_pipeline, args.model_dir, params)
-  # logging.info("Training completed!")
+  logging.info("Building network model...")
+  model_spec = model_fn(params)
+  logging.info("Building completed!")
+
+  logging.info("Initiate training procedure!")
+  train_and_validate(model_spec, train_pipeline, valid_pipeline, args.model_dir, params)
+  logging.info("Training completed!")
 
 
 if __name__ == '__main__':

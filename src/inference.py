@@ -10,7 +10,8 @@ from model.evaluation import evaluate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', type=str, default='experiments/base_model/', help='Experiment directory containing params.json')
-parser.add_argument('--data_dir', type=str, default='../../../Dataset/ArtNet/', help='Directory containing the dataset')
+# FIXME default path for the dataset
+parser.add_argument('--data_dir', type=str, default='../../Cat-Dog-data/', help='Directory containing the dataset')
 parser.add_argument('--restore_from', type=str, default='best_after_epoch_', help='Optional, file containing weights to reload before training')
 
 
@@ -38,8 +39,8 @@ def main():
 
   logging.info("Creating input pipelines...")
 
-  data_pipelines = fetch_pipeline(['test'], args.data_dir, params)
-  test_pipeline = data_pipelines['test']
+  data_pipelines = fetch_pipeline(['testing'], args.data_dir, params)
+  test_pipeline = data_pipelines['testing']
   logging.info("Completed (Testing Dataset)!")
 
   logging.info("Building network model...")

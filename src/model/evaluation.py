@@ -5,6 +5,7 @@ import torch
 from tqdm import tqdm
 
 from model.utils import save_dict_to_json
+from model.model_structure import RunningAverage
 
 
 def evaluate_session(model_spec, pipeline, params):
@@ -17,9 +18,10 @@ def evaluate_session(model_spec, pipeline, params):
   :return: (dict) the batch mean metrics - loss and accuracy etc
   """
   # FIXME define the variables we want from dictionary model_spec
-
+  model_G = model_spec['models']['model_G']
+  model_D = model_spec['models']['model_D']
   # set model to evaluation mode (useful for dropout and batch normalisation layers)
-  model.eval()
+  # model.eval()
 
   # summary for current evaluation loop and a running average object for loss
   summ = []
@@ -28,9 +30,10 @@ def evaluate_session(model_spec, pipeline, params):
   # torch.no_grad() to remove the training effect of BatchNorm in this case as it evaluates the model
   with torch.no_grad():
     with tqdm(total=len(pipeline)) as t:
-      for batch_X, batch_y in pipeline:
-        # FIXME create the content of the loop. This will count for every batch iteration
+      for image_real, image_masked in pipeline:
         pass
+    # FIXME create the content of the loop. This will count for every batch iteration
+
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
   logging.info("- Evaluation metrics: " + metrics_string)
@@ -54,6 +57,7 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   best_weights_dir = os.path.join(model_dir, 'best_weights')
   checkpoints = os.listdir(best_weights_dir)
   best_epochs = []
+
   for c in checkpoints:
     best_epochs.append(c.split('.')[0].split('_')[-1])
 
@@ -62,7 +66,8 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
     raise ("File doesn't exist {}".format(checkpoint))
 
   checkpoint = torch.load(checkpoint)
-  model_spec['net_model'].load_state_dict(checkpoint['state_dict'])
+  model_spec['models']['model_G'].load_state_dict(checkpoint['G_state_dict'])
+  model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
 
   # Inference
   test_metrics = evaluate_session(model_spec, pipeline, params)

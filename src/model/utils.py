@@ -1,7 +1,6 @@
 import json
 import logging
 
-
 class Params:
   """
   Class that loads hyper-parameters from a json file

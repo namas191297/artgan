@@ -3,7 +3,8 @@ import torchvision
 import torch.nn as nn
 import torch.optim as optim
 
-import model.model_definition as model_def
+from model.discriminator import Discriminator_256
+from model.generator import DenseUNet
 
 
 def model_fn(params):
@@ -16,21 +17,44 @@ def model_fn(params):
   # TODO here we will have all the training logit, such as computation of metrics, losses, learning rate scheduler
   # TODO might need to create new files for metrics if we use multiple custom ones... we'll see
 
-  # takes cases on whether we want to train from scratch or use pre-trained weights from ResNet-18 in ImageNet dataset and then re-train the model
-  # from there
-  if params.pretrained_transfer:
-    model = torchvision.models.resnet18(pretrained=True)
-    linear_feature_maps = model.fc.in_features
-    model.fc = nn.Linear(linear_feature_maps, 1)
+  model_D = Discriminator_256(params.num_channels_input, params.features_D).to(params.device)
+  model_G = DenseUNet(params.num_channels_input, params.features_G).to(params.device)
 
-    model = model.to(params.device)
-  else:
-    model = model_def.Network(params).to(params.device)
-  loss_fn = nn.BCEWithLogitsLoss()
-  optimiser = optim.Adam(model.parameters(), lr=params.learning_rate)
+  loss_G = nn.BCELoss()
+  loss_D = nn.BCELoss()
 
-  # TODO important create a dictionary with all the model specs and carry this across our code modules
-  # create a bundle that contains all the necessary components of the model
-  model_spec = {'net_model': model, 'loss_fn': loss_fn, 'optimiser': optimiser, 'metrics': {'accuracy': None}}
+  L1_loss_G = nn.L1Loss()
+
+  optimizer_D = optim.Adam(model_D.parameters(), lr=params.lr_D, betas=(0.5, 0.999))
+  optimizer_G = optim.Adam(model_G.parameters(), lr=params.lr_G, betas=(0.5, 0.999))
+
+  models = {'model_D': model_D, 'model_G': model_G}
+  losses = {'loss_G': loss_G, 'loss_D': loss_D, 'L1_loss_G': L1_loss_G}
+  optimizers = {'optimizer_D': optimizer_D, 'optimizer_G': optimizer_G}
+
+  # TODO implement metrics
+  # metrics = {}
+
+  model_spec = {'models': models,
+                'losses': losses,
+                'optimizers': optimizers}
 
   return model_spec
+
+
+class RunningAverage:
+  """
+  Class that maintains a running average of a metric across the dataset batches.
+  To be used in the loss computation per epoch.
+  """
+
+  def __init__(self):
+    self.count = 0
+    self.total = 0
+
+  def update(self, val):
+    self.total += val
+    self.count += 1
+
+  def __call__(self):
+    return self.total / float(self.count)

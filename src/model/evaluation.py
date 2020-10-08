@@ -2,37 +2,112 @@ import os
 import logging
 import numpy as np
 import torch
+import torchvision
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from model.utils import save_dict_to_json
 from model.model_structure import RunningAverage
 
 
-def evaluate_session(model_spec, pipeline, params):
+def evaluate_session(model_spec, pipeline, writer, params):
   """
   Validate or test the model on batches given by the input pipeline
 
   :param model_spec: (Dictionary), structure that contains the graph operations or nodes needed for validation or testing
   :param pipeline: (DataLoader), Validation or Testing input pipeline
+  :param writer: (SummaryWriter) used to stored validation/testing summary results in TensorBoard
   :param params: (Params), contains hyper-parameters of the model. Must define: num_epochs, batch_size, save_summary_steps, ... etc
   :return: (dict) the batch mean metrics - loss and accuracy etc
   """
-  # FIXME define the variables we want from dictionary model_spec
   model_G = model_spec['models']['model_G']
   model_D = model_spec['models']['model_D']
+
+  criterion_D = model_spec['losses']['criterion_D']
+  criterion_G = model_spec['losses']['criterion_G']
+  L1_criterion_G = model_spec['losses']['L1_criterion_G']
+
   # set model to evaluation mode (useful for dropout and batch normalisation layers)
-  # model.eval()
+  model_G.eval()
+  model_D.eval()
 
   # summary for current evaluation loop and a running average object for loss
   summ = []
-
+  average_loss_D = RunningAverage()
+  average_loss_G = RunningAverage()
   logging.info("Evaluation Session Running...")
   # torch.no_grad() to remove the training effect of BatchNorm in this case as it evaluates the model
   with torch.no_grad():
     with tqdm(total=len(pipeline)) as t:
-      for image_real, image_masked in pipeline:
-        pass
-    # FIXME create the content of the loop. This will count for every batch iteration
+      for i, (image_real, image_masked) in enumerate(pipeline):
+        image_real = image_real.to(params.device)
+        image_masked = image_masked.to(params.device)
+        batch_size = image_real.shape[0]
+
+        # Discriminator ################################################################################################
+        # real image
+        output_D_real = model_D(image_real, image_masked).reshape(-1)  # output of the discriminator for real images
+        label_D_real = (torch.ones(batch_size) * 0.9).to(params.device)  # labels for real images, multiplied by 0.9, training hack
+        loss_D_real = criterion_D(output_D_real, label_D_real)  # first half of discriminator's loss
+
+        confidence_D = output_D_real.mean().item()  # confidence of the discriminator (probability [0, 1])
+
+        # fake image
+        fake = model_G(image_masked)  # generate fakes, given masked images
+
+        # detached so that the generator does not update it's weights while discriminating
+        output_D_fake = model_D(fake.detach(), image_masked).reshape(-1)  # output of the discriminator for fake images
+        label_D_fake = (torch.ones(batch_size) * 0.1).to(params.device)  # labels for fake images, multiplied by 0.1, training hack
+        loss_D_fake = criterion_D(output_D_fake, label_D_fake)  # second half of discriminator's loss
+
+        # aggregate discriminator loss
+        loss_D = (loss_D_real + loss_D_fake) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+
+        # Generator ##################################################################################################
+        output_D_G_fake = model_D(fake, image_masked).reshape(-1)  # fake, D(G(x)), this time weights are updated
+        label_D_G_fake = torch.ones(batch_size).to(params.device)  # labels for fake G(x)
+
+        loss_G_only = criterion_G(output_D_G_fake, label_D_G_fake)  # raw generator loss
+        loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
+        loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
+
+        # Evaluate summaries only once in a while
+        if i % params.save_summary_steps == 0:
+          # store per batch metrics for the epoch results
+          summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item()}
+          summ.append(summary_batch)
+
+        # update the average losses for both discriminator ang generator
+        average_loss_D.update(loss_D.item())
+        average_loss_G.update(loss_G.item())
+
+        # Log the batch loss and accuracy in the tqdm progress bar
+        t.set_postfix(confidence_D='{:05.3f}'.format(confidence_D), loss_D='{:05.3f}'.format(average_loss_D()),
+                      loss_G='{:05.3f}'.format(average_loss_G()))
+
+        # 3 image grids
+        if i % params.save_generated_img_steps == 0:
+          with torch.no_grad():
+            # generate samples to display in evaluation mode
+            model_G.eval()
+            fake = model_G(image_masked)
+            model_G.train()
+
+            # create image grids for visualization
+            img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
+            img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
+            img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
+
+            # combine the grids
+            img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
+            torchvision.utils.save_image(img_grid_combined, f'output\\validation_{i}.jpg')
+
+            # write to tensorboard
+            writer.add_image('Real Images', img_grid_real)
+            writer.add_image('Masked Images', img_grid_masked)
+            writer.add_image('Fake Images', img_grid_fake)
+
+        t.update()
 
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
@@ -57,6 +132,7 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   best_weights_dir = os.path.join(model_dir, 'best_weights')
   checkpoints = os.listdir(best_weights_dir)
   best_epochs = []
+  test_writer = SummaryWriter(os.path.join(model_dir, 'test_summaries'))
 
   for c in checkpoints:
     best_epochs.append(c.split('.')[0].split('_')[-1])
@@ -70,6 +146,9 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
 
   # Inference
-  test_metrics = evaluate_session(model_spec, pipeline, params)
+  test_metrics = evaluate_session(model_spec, pipeline, test_writer, params)
+  test_writer.flush()
+  test_writer.close()
+
   save_path = os.path.join(model_dir, "metrics_test_{}.json".format(restore_from))
   save_dict_to_json(test_metrics, save_path)

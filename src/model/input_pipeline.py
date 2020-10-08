@@ -21,7 +21,8 @@ class ArtNetDataset(torch.utils.data.Dataset):
       transforms.Resize((350, 350)),
       transforms.RandomCrop((256, 256)),
       transforms.ToTensor(),
-      transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+      transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+      transforms.ToPILImage()])
 
     self.mask_transform = transforms.Compose([
       transforms.ColorJitter(brightness=[1, 2], saturation=[1, 2]),
@@ -75,10 +76,10 @@ def fetch_pipeline(types, data_dir, params):
   mask_dir = os.path.join(data_dir, 'masks/')
   for set in types:
     set_dir = os.path.join(data_dir, set)
-    if set == 'training':
+    if set == 'train':
       train_dataset = ArtNetDataset(set_dir, mask_dir)
       pipeline = DataLoader(train_dataset, batch_size=params.batch_size, shuffle=True, num_workers=params.num_workers, pin_memory=params.cuda)
-    elif set == 'testing':
+    elif set == 'test':
       test_dataset = ArtNetDataset(set_dir, mask_dir)
       pipeline = DataLoader(test_dataset, batch_size=params.batch_size, shuffle=False, num_workers=params.num_workers, pin_memory=params.cuda)
     else:  # validation case

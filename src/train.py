@@ -37,8 +37,8 @@ def main():
 
   logging.info("Creating input pipelines...")
 
-  data_pipelines = fetch_pipeline(['training', 'validation'], args.data_dir, params)
-  train_pipeline = data_pipelines['training']
+  data_pipelines = fetch_pipeline(['train', 'validation'], args.data_dir, params)
+  train_pipeline = data_pipelines['train']
   logging.info("Completed (Training Dataset)!")
   valid_pipeline = data_pipelines['validation']
   logging.info("Completed (Validation Dataset)!")

@@ -1,9 +1,15 @@
 {
-  "learning_rate": 1e-4,
-  "batch_size": 32,
-  "num_epochs": 15,
+  "lr_D": 0.001,
+  "lr_G": 0.001,
+  "loss_D_factor": 0.5,
+  "features_D": 64,
+  "features_G": 64,
+  "L1_lambda": 100,
+  "batch_size": 24,
+  "num_epochs": 500,
+  "image_size": 224,
   "num_channels": 3,
-  "num_filters": 32,
-  "save_summary_steps": 100,
-  "num_workers": 1
+  "num_workers": 1,
+  "save_summary_steps": 50,
+  "save_generated_img_steps": 50
 }

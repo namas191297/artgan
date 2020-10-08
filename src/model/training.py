@@ -24,10 +24,9 @@ def train_session(model_spec, pipeline, epoch, writer, params):
   model_G = model_spec['models']['model_G']
   model_D = model_spec['models']['model_D']
 
-  # needs to be updated in json
   criterion_D = model_spec['losses']['criterion_D']
   criterion_G = model_spec['losses']['criterion_G']
-  L1_loss_G = model_spec['losses']['L1_loss_G']
+  L1_criterion_G = model_spec['losses']['L1_criterion_G']
 
   optimizer_D = model_spec['optimizers']['optimizer_D']
   optimizer_G = model_spec['optimizers']['optimizer_G']
@@ -81,7 +80,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       label_D_G_fake = torch.ones(batch_size).to(params.device)  # labels for fake G(x)
 
       loss_G_only = criterion_G(output_D_G_fake, label_D_G_fake)  # raw generator loss
-      loss_G_L1 = L1_loss_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
+      loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
       loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
 
       # update generator weights
@@ -157,13 +156,13 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
     logging.info("Epoch {}/{}".format(epoch + 1, params.num_epochs))
 
     # compute number of batches in one epoch (one full pass over the training dataset)
-    train_mean_metrics = train_session(model_spec, train_pipeline, epoch, params)
+    train_mean_metrics = train_session(model_spec, train_pipeline, epoch, train_writer, params)
 
     for k, v in train_mean_metrics.items():
       train_writer.add_scalar(k, v, global_step=epoch + 1)
 
     # Evaluate for one epoch on the validation dataset
-    valid_mean_metrics = evaluate_session(model_spec, valid_pipeline, params)
+    valid_mean_metrics = evaluate_session(model_spec, valid_pipeline, eval_writer, params)
     for k, v in valid_mean_metrics.items():
       eval_writer.add_scalar(k, v, global_step=epoch + 1)
 

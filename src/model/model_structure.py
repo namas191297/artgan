@@ -17,19 +17,19 @@ def model_fn(params):
   # TODO here we will have all the training logit, such as computation of metrics, losses, learning rate scheduler
   # TODO might need to create new files for metrics if we use multiple custom ones... we'll see
 
-  model_D = Discriminator_256(params.num_channels_input, params.features_D).to(params.device)
-  model_G = DenseUNet(params.num_channels_input, params.features_G).to(params.device)
+  model_D = Discriminator_256(params.num_channels, params.features_D).to(params.device)
+  model_G = DenseUNet(params.num_channels, params.features_G).to(params.device)
 
-  loss_G = nn.BCELoss()
-  loss_D = nn.BCELoss()
+  criterion_G = nn.BCELoss()
+  criterion_D = nn.BCELoss()
 
-  L1_loss_G = nn.L1Loss()
+  L1_criterion_G = nn.L1Loss()
 
   optimizer_D = optim.Adam(model_D.parameters(), lr=params.lr_D, betas=(0.5, 0.999))
   optimizer_G = optim.Adam(model_G.parameters(), lr=params.lr_G, betas=(0.5, 0.999))
 
   models = {'model_D': model_D, 'model_G': model_G}
-  losses = {'loss_G': loss_G, 'loss_D': loss_D, 'L1_loss_G': L1_loss_G}
+  losses = {'criterion_G': criterion_G, 'criterion_D': criterion_D, 'L1_criterion_G': L1_criterion_G}
   optimizers = {'optimizer_D': optimizer_D, 'optimizer_G': optimizer_G}
 
   # TODO implement metrics

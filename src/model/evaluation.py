@@ -27,6 +27,10 @@ def evaluate_session(model_spec, pipeline, writer, params):
   criterion_G = model_spec['losses']['criterion_G']
   L1_criterion_G = model_spec['losses']['L1_criterion_G']
 
+  criterion_mse = model_spec['metrics']['mse']
+  criterion_ssim = model_spec['metrics']['ssim']
+  criterion_pp_acc = model_spec['metrics']['per_pixel_accuracy']
+
   # set model to evaluation mode (useful for dropout and batch normalisation layers)
   model_G.eval()
   model_D.eval()
@@ -35,6 +39,9 @@ def evaluate_session(model_spec, pipeline, writer, params):
   summ = []
   average_loss_D = RunningAverage()
   average_loss_G = RunningAverage()
+  average_per_pixel_acc = RunningAverage()
+  average_mse = RunningAverage()
+  average_ssim = RunningAverage()
   logging.info("Evaluation Session Running...")
   # torch.no_grad() to remove the training effect of BatchNorm in this case as it evaluates the model
   with torch.no_grad():
@@ -71,19 +78,37 @@ def evaluate_session(model_spec, pipeline, writer, params):
         loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
         loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
 
+        # Metrics ####################################################################################################
+        # extract data from torch Tensors, move to cpu
+        batch_real = image_real.data.cpu()
+        batch_fake = fake.data.cpu()
+
+        # Per Pixel Accuracy
+        pp_accuracy = criterion_pp_acc(batch_real, batch_fake)
+
+        # Mean Square Error (MSE)
+        mse = criterion_mse(batch_real, batch_fake)
+
+        # Structural Similarity Index Measure (SSIM)
+        ssim = criterion_ssim(batch_real, batch_fake)
+
         # Evaluate summaries only once in a while
-        if i % params.save_summary_steps == 0:
-          # store per batch metrics for the epoch results
-          summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item()}
-          summ.append(summary_batch)
+        # if i % params.save_summary_steps == 0:
+        # store per batch metrics for the epoch results
+        summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
+        summ.append(summary_batch)
 
         # update the average losses for both discriminator ang generator
         average_loss_D.update(loss_D.item())
         average_loss_G.update(loss_G.item())
+        average_per_pixel_acc.update(pp_accuracy.item())
+        average_mse.update(mse.item())
+        average_ssim.update(ssim.item())
 
         # Log the batch loss and accuracy in the tqdm progress bar
         t.set_postfix(confidence_D='{:05.3f}'.format(confidence_D), loss_D='{:05.3f}'.format(average_loss_D()),
-                      loss_G='{:05.3f}'.format(average_loss_G()))
+                      loss_G='{:05.3f}'.format(average_loss_G()), pp_acc='{:05.3f}'.format(average_per_pixel_acc()),
+                      mse='{:05.3f}'.format(average_mse()), ssim='{:05.3f}'.format(average_ssim()))
 
         # 3 image grids
         if i % params.save_generated_img_steps == 0:

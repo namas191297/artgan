@@ -33,7 +33,7 @@ def model_fn(params):
   losses = {'criterion_G': criterion_G, 'criterion_D': criterion_D, 'L1_criterion_G': L1_criterion_G}
   optimizers = {'optimizer_D': optimizer_D, 'optimizer_G': optimizer_G}
 
-  metrics = {'mse': nn.MSELoss(), 'ssim': SSIM()}
+  metrics = {'MSE': nn.MSELoss(), 'SSIM': SSIM(), 'per_pixel_accuracy': per_pixel_accuracy}
 
   model_spec = {'models': models,
                 'losses': losses,
@@ -41,6 +41,14 @@ def model_fn(params):
                 'metrics': metrics}
 
   return model_spec
+
+
+def per_pixel_accuracy(real, generated):
+  total_pixels = 0
+  total_pixels += real.nelement()
+  correct_pixels = torch.sum(real.eq(generated)).item()
+  pp_acc = correct_pixels / total_pixels
+  return pp_acc
 
 
 def gaussian(window_size, sigma):

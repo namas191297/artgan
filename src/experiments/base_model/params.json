@@ -1,6 +1,6 @@
 {
-  "lr_D": 0.001,
-  "lr_G": 0.001,
+  "lr_D": 0.0002,
+  "lr_G": 0.0002,
   "loss_D_factor": 0.5,
   "features_D": 64,
   "features_G": 64,

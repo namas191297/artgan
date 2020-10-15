@@ -155,9 +155,9 @@ def train_session(model_spec, pipeline, epoch, writer, params):
           torchvision.utils.save_image(img_grid_combined, f'output\\{epoch}_{i}.jpg')
 
           # write to tensorboard
-          writer.add_image('Real Images', img_grid_real)
-          writer.add_image('Masked Images', img_grid_masked)
-          writer.add_image('Fake Images', img_grid_fake)
+          writer.add_image('Real_Images', img_grid_real)
+          writer.add_image('Masked_Images', img_grid_masked)
+          writer.add_image('Fake_Images', img_grid_fake)
 
       t.update()
 

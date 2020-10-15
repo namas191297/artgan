@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class DenseBlock(nn.Module):
 
   def __init__(self, num_channels_input, features_G, dropout_ratio=0.5, leak_slope=0.2):
@@ -159,6 +160,9 @@ class DenseUNet(nn.Module):
       out_concat_3 = torch.cat((out_concat_2, out_4), 1)
 
       out_final = self.out_final(out_concat_3)
+
+    else:
+      raise NotImplementedError
 
     return out_final
 

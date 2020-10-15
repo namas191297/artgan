@@ -1,44 +1,120 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
-# input size N x 3 x 256 x 256, for image GAN
-# output size N x 1 (maybe, as outputs a single number, not sure if N x 1 x 1 x 1)
-class Discriminator_256(nn.Module):
-  # initializers
+class Discriminator_1(nn.Module):
+
   def __init__(self, num_channels_input, features_D):
-    d = features_D
-    super(Discriminator_256, self).__init__()
-    self.conv1 = nn.Conv2d(6, d, 4, 2, 1)
-    self.conv2 = nn.Conv2d(d, d * 2, 4, 4, 1)
-    self.conv2_bn = nn.BatchNorm2d(d * 2)
+    super(Discriminator_1, self).__init__()
 
-    self.conv3 = nn.Conv2d(d * 2, d * 4, 4, 4, 1)
-    self.conv3_bn = nn.BatchNorm2d(d * 4)
+    self.conv_1 = nn.Conv2d(in_channels=num_channels_input * 2, out_channels=features_D, kernel_size=1, stride=1)
+    self.conv_2 = nn.Conv2d(in_channels=features_D, out_channels=features_D * 2, kernel_size=1, stride=1)
+    self.bn_2 = nn.BatchNorm2d(features_D * 2)
+    self.conv_out = nn.Conv2d(in_channels=features_D * 2, out_channels=1, kernel_size=1, stride=1)
 
-    self.conv4 = nn.Conv2d(d * 4, d * 8, 4, 4, 1)
-    self.conv4_bn = nn.BatchNorm2d(d * 8)
-    self.conv5 = nn.Conv2d(d * 8, 1, 4, 4, 1)
-
-  # weight_init
-  def weight_init(self, mean, std):
-    for m in self._modules:
-      normal_init(self._modules[m], mean, std)
+    self.leaky_relu = nn.LeakyReLU(negative_slope=0.2)
+    self.sigmoid = nn.Sigmoid()
 
   # forward method
-  def forward(self, input, label):
-    x = torch.cat([input, label], 1)
-    x = F.leaky_relu(self.conv1(x), 0.2)
-    x = F.leaky_relu(self.conv2_bn(self.conv2(x)), 0.2)
-    x = F.leaky_relu(self.conv3_bn(self.conv3(x)), 0.2)
-    x = F.leaky_relu(self.conv4_bn(self.conv4(x)), 0.2)
-    x = torch.sigmoid(self.conv5(x))
-    # print(x.shape)
-    return x
+  def forward(self, input_image, image_masked):
+    out = torch.cat([input_image, image_masked], 1)
+    out = self.leaky_relu(self.conv_1(out))
+    print(out.shape)
+    out = self.leaky_relu(self.bn_2(self.conv_2(out)))
+    print(out.shape)
+    out = self.sigmoid(self.conv_out(out))
+    print(out.shape)
+    return out
 
 
-def normal_init(m, mean, std):
-  if isinstance(m, nn.ConvTranspose2d) or isinstance(m, nn.Conv2d):
-    m.weight.data.normal_(mean, std)
-    m.bias.data.zero_()
+class Discriminator_16(nn.Module):
+
+  def __init__(self, num_channels_input, features_D):
+    super(Discriminator_16, self).__init__()
+
+    self.conv_1 = nn.Conv2d(in_channels=num_channels_input * 2, out_channels=features_D, kernel_size=4, stride=2, padding=1)
+    self.conv_2 = nn.Conv2d(in_channels=features_D, out_channels=features_D * 2, kernel_size=4, stride=2, padding=1)
+    self.bn_2 = nn.BatchNorm2d(features_D * 2)
+    self.conv_out = nn.Conv2d(in_channels=features_D * 2, out_channels=1, kernel_size=4, stride=4, padding=0)
+
+    self.leaky_relu = nn.LeakyReLU(negative_slope=0.2)
+    self.sigmoid = nn.Sigmoid()
+
+  # forward method
+  def forward(self, input_image, image_masked):
+    out = torch.cat([input_image, image_masked], 1)
+    out = self.leaky_relu(self.conv_1(out))
+    out = self.leaky_relu(self.bn_2(self.conv_2(out)))
+    out = self.sigmoid(self.conv_out(out))
+    return out
+
+
+class Discriminator_70(nn.Module):
+
+  def __init__(self, num_channels_input, features_D):
+    super(Discriminator_70, self).__init__()
+
+    self.conv_1 = nn.Conv2d(in_channels=num_channels_input * 2, out_channels=features_D, kernel_size=4, stride=2, padding=1)
+    self.conv_2 = nn.Conv2d(in_channels=features_D, out_channels=features_D * 2, kernel_size=4, stride=2, padding=1)
+    self.bn_2 = nn.BatchNorm2d(features_D * 2)
+
+    self.conv_3 = nn.Conv2d(in_channels=features_D * 2, out_channels=features_D * 4, kernel_size=4, stride=2, padding=1)
+    self.bn_3 = nn.BatchNorm2d(features_D * 4)
+
+    self.conv_4 = nn.Conv2d(in_channels=features_D * 4, out_channels=features_D * 8, kernel_size=4, stride=2, padding=1)
+    self.bn_4 = nn.BatchNorm2d(features_D * 8)
+
+    self.conv_out = nn.Conv2d(in_channels=features_D * 8, out_channels=1, kernel_size=4, stride=4, padding=1)
+
+    self.leaky_relu = nn.LeakyReLU(negative_slope=0.2)
+    self.sigmoid = nn.Sigmoid()
+
+  # forward method
+  def forward(self, input_image, image_masked):
+    out = torch.cat([input_image, image_masked], 1)
+    out = self.leaky_relu(self.conv_1(out))
+    out = self.leaky_relu(self.bn_2(self.conv_2(out)))
+    out = self.leaky_relu(self.bn_3(self.conv_3(out)))
+    out = self.leaky_relu(self.bn_4(self.conv_4(out)))
+    out = self.sigmoid(self.conv_out(out))
+    return out
+
+
+class Discriminator_256(nn.Module):
+
+  def __init__(self, num_channels_input, features_D):
+    super(Discriminator_256, self).__init__()
+
+    self.conv_1 = nn.Conv2d(in_channels=num_channels_input * 2, out_channels=features_D, kernel_size=4, stride=2, padding=1)
+    self.conv_2 = nn.Conv2d(in_channels=features_D, out_channels=features_D * 2, kernel_size=4, stride=2, padding=1)
+    self.bn_2 = nn.BatchNorm2d(features_D * 2)
+
+    self.conv_3 = nn.Conv2d(in_channels=features_D * 2, out_channels=features_D * 4, kernel_size=4, stride=2, padding=1)
+    self.bn_3 = nn.BatchNorm2d(features_D * 4)
+
+    self.conv_4 = nn.Conv2d(in_channels=features_D * 4, out_channels=features_D * 8, kernel_size=4, stride=2, padding=1)
+    self.bn_4 = nn.BatchNorm2d(features_D * 8)
+
+    self.conv_5 = nn.Conv2d(in_channels=features_D * 8, out_channels=features_D * 8, kernel_size=4, stride=2, padding=1)
+    self.bn_5 = nn.BatchNorm2d(features_D * 8)
+
+    self.conv_6 = nn.Conv2d(in_channels=features_D * 8, out_channels=features_D * 8, kernel_size=4, stride=2, padding=1)
+    self.bn_6 = nn.BatchNorm2d(features_D * 8)
+
+    self.conv_out = nn.Conv2d(in_channels=features_D * 8, out_channels=1, kernel_size=4, stride=4, padding=1)
+
+    self.leaky_relu = nn.LeakyReLU(negative_slope=0.2)
+    self.sigmoid = nn.Sigmoid()
+
+  # forward method
+  def forward(self, input_image, image_masked):
+    out = torch.cat([input_image, image_masked], 1)
+    out = self.leaky_relu(self.conv_1(out))
+    out = self.leaky_relu(self.bn_2(self.conv_2(out)))
+    out = self.leaky_relu(self.bn_3(self.conv_3(out)))
+    out = self.leaky_relu(self.bn_4(self.conv_4(out)))
+    out = self.leaky_relu(self.bn_5(self.conv_5(out)))
+    out = self.leaky_relu(self.bn_6(self.conv_6(out)))
+    out = self.sigmoid(self.conv_out(out))
+
+    return out

@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class DenseBlock(nn.Module):
 
   def __init__(self, num_channels_input, features_G, dropout_ratio=0.5, leak_slope=0.2):
@@ -101,7 +100,6 @@ class DenseBlock(nn.Module):
 
 
 class DenseUNet(nn.Module):
-
   def __init__(self, num_channels_input, features_G, noise_tensor=None, num_dense_blocks=4):
     super(DenseUNet, self).__init__()
     self.num_dense_blocks = num_dense_blocks
@@ -113,6 +111,8 @@ class DenseUNet(nn.Module):
     else:
       self.num_channels_input = num_channels_input
 
+    self.num_channels_output = num_channels_input
+
     self.block_1 = DenseBlock(self.num_channels_input, self.features_G)
     self.block_2 = DenseBlock(self.num_channels_input, self.features_G)
     self.block_3 = DenseBlock(self.num_channels_input, self.features_G)
@@ -121,7 +121,7 @@ class DenseUNet(nn.Module):
     self.block_6 = DenseBlock(self.num_channels_input, self.features_G)
 
     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks * self.num_channels_input,
-                               out_channels=self.num_channels_input, kernel_size=1, stride=1)
+                               out_channels=self.num_channels_output, kernel_size=1, stride=1)
 
   def forward(self, image_masked, noise_tensor=None):
 
@@ -159,9 +159,6 @@ class DenseUNet(nn.Module):
       out_concat_3 = torch.cat((out_concat_2, out_4), 1)
 
       out_final = self.out_final(out_concat_3)
-
-    else:
-      raise NotImplementedError
 
     return out_final
 

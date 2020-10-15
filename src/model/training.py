@@ -31,7 +31,10 @@ def train_session(model_spec, pipeline, epoch, writer, params):
   optimizer_D = model_spec['optimizers']['optimizer_D']
   optimizer_G = model_spec['optimizers']['optimizer_G']
 
-  # metrics = model_spec['metrics']
+  criterion_mse = model_spec['metrics']['mse']
+  criterion_ssim = model_spec['metrics']['ssim']
+
+  metrics = model_spec['metrics']
 
   # set model to training mode
   model_G.train()

@@ -5,7 +5,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import math
 
-from model.discriminator import Discriminator_256
+from model.discriminator import *
 from model.generator import DenseUNet
 from torch.autograd import Variable
 
@@ -18,7 +18,8 @@ def model_fn(params):
   :return: (dict), A dictionary that contains the graph operations or nodes needed for training/validation/testing
   """
 
-  model_D = Discriminator_256(params.num_channels, params.features_D).to(params.device)
+  # model_D = Discriminator_256(params.num_channels, params.features_D).to(params.device)
+  model_D = get_discriminator(patch_size=params.patch_size, num_channels_input=params.num_channels, features_D=params.features_D).to(params.device)
   model_G = DenseUNet(params.num_channels, params.features_G).to(params.device)
 
   criterion_G = nn.BCELoss()

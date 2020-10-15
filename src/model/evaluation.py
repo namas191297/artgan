@@ -6,7 +6,7 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from model.utils import save_dict_to_json, get_random_noise_tensor
+from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss
 from model.model_structure import RunningAverage
 
 
@@ -55,7 +55,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
 
         loss_D_real, confidence_D = get_discriminator_loss(image_real, image_masked, params.patch_size, 'real_D', model_D, criterion_D, params.image_size, params.device)
 
-        confidence_D = output_D_real.mean().item()  # confidence of the discriminator (probability [0, 1])
+        # confidence_D = output_D_real.mean().item()  # confidence of the discriminator (probability [0, 1])
 
         # fake image
         noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)

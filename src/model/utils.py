@@ -73,9 +73,66 @@ def save_dict_to_json(d, json_path):
     json.dump(d, f, indent=4)
 
 def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
+  noise_tensor = None
   if params.use_noise:
     noise_tensor = torch.randn((batch_size, num_channels_input, image_size, image_size), dtype=torch.float32).to(params.device)
-  else:
-    noise_tensor = None
+
   return noise_tensor
 
+def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
+
+  batch_size = image_real.shape[0]
+  start_index = 0
+  end_index = image_size - patch_size + 1
+  stride = patch_size // 2
+  if stride < 1:
+    stride = 1
+  num_steps_frac = end_index / stride
+  num_steps = int(num_steps_frac)
+
+  # handle last stride
+  if num_steps_frac - num_steps > 1e-9:
+    end_index += stride
+  loss_D_running = None
+  confidence_D_running = None
+  num_patches = 0
+
+  for index_x in range(start_index, end_index, stride):
+    x_start = index_x
+    x_end = x_start + patch_size
+
+    if x_end > image_size:
+      x_start = image_size - patch_size
+      x_end = image_size
+    for index_y in range(start_index, end_index, stride):
+
+      y_start = index_y
+      y_end = y_start + patch_size
+      if y_end > image_size:
+        y_start = image_size - patch_size
+        y_end = image_size
+
+      current_crop_image = image_real[:, :, x_start:x_end, y_start:y_end]
+      current_crop_masked = image_masked[:, :, x_start:x_end, y_start:y_end]
+
+      if variant is 'real_D':
+        label = (torch.ones(batch_size) * 0.9).to(device)
+      elif variant is 'fake_D':
+        label = (torch.ones(batch_size) * 0.1).to(device)
+      elif variant is 'fake_G':
+        label = torch.ones(batch_size).to(device)
+
+      output = model_D(current_crop_image, current_crop_masked)
+      current_loss = criterion_D(output, label)
+
+      if loss_D_running is None:
+        loss_D_running = current_loss
+        confidence_D_running = output.mean().item()
+      else:
+        loss_D_running += current_loss
+        confidence_D_running += output.mean().item()
+      num_patches += 1
+    loss_D_running /= num_patches
+    confidence_D_running /= num_patches
+      
+  return loss_D_running, confidence_D_running

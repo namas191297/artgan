@@ -101,7 +101,7 @@ class DenseBlock(nn.Module):
 
 
 class DenseUNet(nn.Module):
-  def __init__(self, num_channels_input, features_G, noise_tensor=None, num_dense_blocks=4):
+  def __init__(self, num_channels_input, features_G, num_dense_blocks=4, noise_tensor=None):
     super(DenseUNet, self).__init__()
     self.num_dense_blocks = num_dense_blocks
     self.noise_tensor = noise_tensor

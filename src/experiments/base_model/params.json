@@ -3,7 +3,7 @@
   "lr_G": 0.0002,
   "loss_D_factor": 0.5,
   "features_D": 64,
-  "features_G": 12,
+  "features_G": 16,
   "L1_lambda": 100,
   "batch_size": 10,
   "num_epochs": 500,
@@ -13,5 +13,6 @@
   "save_summary_steps": 50,
   "save_generated_img_steps": 50,
   "use_noise": true,
-  "patch_size": 70
+  "patch_size": 70,
+  "num_dense_blocks": 6
 }

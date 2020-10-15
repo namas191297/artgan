@@ -8,6 +8,7 @@ import math
 from model.discriminator import *
 from model.generator import DenseUNet
 from torch.autograd import Variable
+from model.utils import get_random_noise_tensor
 
 
 def model_fn(params):
@@ -19,8 +20,9 @@ def model_fn(params):
   """
 
   # model_D = Discriminator_256(params.num_channels, params.features_D).to(params.device)
+  noise_tensor = get_random_noise_tensor(params.batch_size, params.num_channels, params.image_size, params)
   model_D = get_discriminator(patch_size=params.patch_size, num_channels_input=params.num_channels, features_D=params.features_D).to(params.device)
-  model_G = DenseUNet(params.num_channels, params.features_G).to(params.device)
+  model_G = DenseUNet(params.num_channels, params.features_G, num_dense_blocks=params.num_dense_blocks, noise_tensor=noise_tensor).to(params.device)
 
   criterion_G = nn.BCELoss()
   criterion_D = nn.BCELoss()

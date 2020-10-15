@@ -60,10 +60,11 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       model_D.zero_grad()
 
       # real image
-      output_D_real = model_D(image_real, image_masked).reshape(-1)  # output of the discriminator for real images
-      label_D_real = (torch.ones(batch_size) * 0.9).to(params.device)  # labels for real images, multiplied by 0.9, training hack
-      loss_D_real = criterion_D(output_D_real, label_D_real)  # first half of discriminator's loss
-      
+      # output_D_real = model_D(image_real, image_masked).reshape(-1)  # output of the discriminator for real images
+      # label_D_real = (torch.ones(batch_size) * 0.9).to(params.device)  # labels for real images, multiplied by 0.9, training hack
+      # loss_D_real = criterion_D(output_D_real, label_D_real)  # first half of discriminator's loss
+
+      loss_D_real, confidence_D = get_discriminator_loss(image_real, image_masked, params.patch_size, 'real_D', model_D, criterion_D, params.image_size, params.device)
       
 
       confidence_D = output_D_real.mean().item()  # confidence of the discriminator (probability [0, 1])
@@ -73,9 +74,11 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
 
       # detached so that the generator does not update it's weights while discriminating
-      output_D_fake = model_D(fake.detach(), image_masked).reshape(-1)  # output of the discriminator for fake images
-      label_D_fake = (torch.ones(batch_size) * 0.1).to(params.device)  # labels for fake images, multiplied by 0.1, training hack
-      loss_D_fake = criterion_D(output_D_fake, label_D_fake)  # second half of discriminator's loss
+      # output_D_fake = model_D(fake.detach(), image_masked).reshape(-1)  # output of the discriminator for fake images
+      # label_D_fake = (torch.ones(batch_size) * 0.1).to(params.device)  # labels for fake images, multiplied by 0.1, training hack
+      # loss_D_fake = criterion_D(output_D_fake, label_D_fake)  # second half of discriminator's loss
+
+      loss_D_fake, _ = get_discriminator_loss(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D, criterion_D, params.image_size, params.device)
 
       # aggregate discriminator loss
       loss_D = (loss_D_real + loss_D_fake) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
@@ -87,10 +90,13 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       # Generator ##################################################################################################
       model_G.zero_grad()
 
-      output_D_G_fake = model_D(fake, image_masked).reshape(-1)  # fake, D(G(x)), this time weights are updated
-      label_D_G_fake = torch.ones(batch_size).to(params.device)  # labels for fake G(x)
+      # output_D_G_fake = model_D(fake, image_masked).reshape(-1)  # fake, D(G(x)), this time weights are updated
+      # label_D_G_fake = torch.ones(batch_size).to(params.device)  # labels for fake G(x)
+      # loss_G_only = criterion_G(output_D_G_fake, label_D_G_fake)  # raw generator loss
 
-      loss_G_only = criterion_G(output_D_G_fake, label_D_G_fake)  # raw generator loss
+      loss_G_only, _ = get_discriminator_loss(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G, params.image_size, params.device)
+
+
       loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
       loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
 

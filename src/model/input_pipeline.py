@@ -5,28 +5,39 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
+train_transform = transforms.Compose([
+  transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
+  transforms.RandomRotation(10),
+  transforms.Resize((350, 350)),
+  transforms.RandomCrop((256, 256)),
+  transforms.ToTensor(),
+  transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+  transforms.ToPILImage()])
+
+mask_transform = transforms.Compose([
+  transforms.ColorJitter(brightness=[1, 2], saturation=[1, 2]),
+  transforms.RandomRotation(60)])
+
+eval_transform = transforms.Compose([
+  transforms.ToTensor(),
+  transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+  transforms.ToPILImage()])
+
 
 class ArtNetDataset(torch.utils.data.Dataset):
 
-  def __init__(self, dataset_dir, mask_dir, transform=None):
+  def __init__(self, dataset_dir, mask_dir, split):
     # Initialize certain variables that will be used later.
+    assert split in ['train', 'validation', 'test'], 'Error: Inserted incorrect set. Valid sets are case-sensitive = train or validation or test'
     self.dataset_dir = dataset_dir
     self.mask_sizes = [(32, 32), (64, 64), (128, 128)]
     self.mask_dir = mask_dir
+    self.split = split
 
     # Initialize transformations that need to be applied on the dataset
-    self.img_transform = transforms.Compose([
-      transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
-      transforms.RandomRotation(10),
-      transforms.Resize((350, 350)),
-      transforms.RandomCrop((256, 256)),
-      transforms.ToTensor(),
-      transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-      transforms.ToPILImage()])
-
-    self.mask_transform = transforms.Compose([
-      transforms.ColorJitter(brightness=[1, 2], saturation=[1, 2]),
-      transforms.RandomRotation(60)])
+    self.train_transform = train_transform
+    self.mask_transform = mask_transform
+    self.eval_transform = eval_transform
 
     self.toTensor = transforms.ToTensor()
 
@@ -56,7 +67,10 @@ class ArtNetDataset(torch.utils.data.Dataset):
   def __getitem__(self, idx):
     current_file = self.filenames[idx]
     self.current_image = Image.open(os.path.join(self.dataset_dir, current_file))
-    real_image = self.img_transform(self.current_image)
+    if self.split == 'train':
+      real_image = self.train_transform(self.current_image)
+    else:
+      real_image = self.eval_transform(self.current_image)
     masked_image = self.add_mask(real_image)
 
     return self.toTensor(real_image), self.toTensor(masked_image)
@@ -77,13 +91,13 @@ def fetch_pipeline(types, data_dir, params):
   for set in types:
     set_dir = os.path.join(data_dir, set)
     if set == 'train':
-      train_dataset = ArtNetDataset(set_dir, mask_dir)
+      train_dataset = ArtNetDataset(set_dir, mask_dir, set)
       pipeline = DataLoader(train_dataset, batch_size=params.batch_size, shuffle=True, num_workers=params.num_workers, pin_memory=params.cuda)
     elif set == 'test':
-      test_dataset = ArtNetDataset(set_dir, mask_dir)
+      test_dataset = ArtNetDataset(set_dir, mask_dir, set)
       pipeline = DataLoader(test_dataset, batch_size=params.batch_size, shuffle=False, num_workers=params.num_workers, pin_memory=params.cuda)
     else:  # validation case
-      valid_dataset = ArtNetDataset(set_dir, mask_dir)
+      valid_dataset = ArtNetDataset(set_dir, mask_dir, set)
       pipeline = DataLoader(valid_dataset, batch_size=params.batch_size, shuffle=False, num_workers=params.num_workers, pin_memory=params.cuda)
 
     data_pipelines[set] = pipeline

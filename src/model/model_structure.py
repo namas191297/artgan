@@ -60,7 +60,6 @@ def create_window(window_size, channel):
   _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
   _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
   window = torch.Tensor(_2D_window.expand(channel, 1, window_size, window_size).contiguous())
-  print(window)
   return window
 
 
@@ -152,3 +151,42 @@ class RunningAverage:
 
   def __call__(self):
     return self.total / float(self.count)
+
+def get_discriminator_outputs(output_D_real, label_D_real):
+  current_batch_size = image_batch_dummy.shape[0]
+  start_index = 0
+  end_index = image_size - patch_size + 1
+  stride = 6
+  num_steps_frac = end_index / stride
+  num_steps = int(num_steps_frac)
+
+  # handle last stride
+  if num_steps_frac - num_steps > 1e-9:
+    end_index += stride
+  loss_D_running = None
+
+  for index_x in range(start_index, end_index, stride):
+    x_start = index_x
+    x_end = x_start + patch_size
+
+    if x_end > image_size:
+      x_start = image_size - patch_size
+      x_end = image_size
+    for index_y in range(start_index, end_index, stride):
+
+      y_start = index_y
+      y_end = y_start + patch_size
+      if y_end > image_size:
+        y_start = image_size - patch_size
+        y_end = image_size
+
+      current_crop_real = output_D_real[:, :, x_start:x_end, y_start:y_end]
+      current_crop_label = label_D_real[:, :, x_start:x_end, y_start:y_end]
+
+      output = model_D(current_crop_real, current_crop_label)
+      current_loss = criterion_D(output_D_real, label_D_real)
+
+      if loss_D_running is None:
+        loss_D_running = current_loss
+      loss_D_running += current_loss
+  return loss_D_running

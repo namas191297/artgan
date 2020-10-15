@@ -7,7 +7,10 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
-from model.utils import save_dict_to_json
+from model.utils import save_dict_to_json, get_random_noise_tensor
+
+
+
 
 
 def train_session(model_spec, pipeline, epoch, writer, params):
@@ -31,8 +34,8 @@ def train_session(model_spec, pipeline, epoch, writer, params):
   optimizer_D = model_spec['optimizers']['optimizer_D']
   optimizer_G = model_spec['optimizers']['optimizer_G']
 
-  criterion_mse = model_spec['metrics']['mse']
-  criterion_ssim = model_spec['metrics']['ssim']
+  criterion_mse = model_spec['metrics']['MSE']
+  criterion_ssim = model_spec['metrics']['SSIM']
   criterion_pp_acc = model_spec['metrics']['per_pixel_accuracy']
 
   # set model to training mode
@@ -60,11 +63,14 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       output_D_real = model_D(image_real, image_masked).reshape(-1)  # output of the discriminator for real images
       label_D_real = (torch.ones(batch_size) * 0.9).to(params.device)  # labels for real images, multiplied by 0.9, training hack
       loss_D_real = criterion_D(output_D_real, label_D_real)  # first half of discriminator's loss
+      
+      
 
       confidence_D = output_D_real.mean().item()  # confidence of the discriminator (probability [0, 1])
 
       # fake image
-      fake = model_G(image_masked)  # generate fakes, given masked images
+      noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
+      fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
 
       # detached so that the generator does not update it's weights while discriminating
       output_D_fake = model_D(fake.detach(), image_masked).reshape(-1)  # output of the discriminator for fake images
@@ -117,7 +123,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       # this averages is only for visualisation in the progress bar
       average_loss_D.update(loss_D.item())
       average_loss_G.update(loss_G.item())
-      average_per_pixel_acc.update(pp_accuracy.item())
+      average_per_pixel_acc.update(pp_accuracy)
       average_mse.update(mse.item())
       average_ssim.update(ssim.item())
 
@@ -130,9 +136,8 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       if i % params.save_generated_img_steps == 0:
         with torch.no_grad():
           # generate samples to display in evaluation mode
-          model_G.eval()
-          fake = model_G(image_masked)
-          model_G.train()
+          noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
+          fake = model_G(image_masked, noise_tensor)
 
           # create image grids for visualization
           img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))

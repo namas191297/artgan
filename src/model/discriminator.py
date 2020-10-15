@@ -19,11 +19,8 @@ class Discriminator_1(nn.Module):
   def forward(self, input_image, image_masked):
     out = torch.cat([input_image, image_masked], 1)
     out = self.leaky_relu(self.conv_1(out))
-    print(out.shape)
     out = self.leaky_relu(self.bn_2(self.conv_2(out)))
-    print(out.shape)
     out = self.sigmoid(self.conv_out(out))
-    print(out.shape)
     return out
 
 

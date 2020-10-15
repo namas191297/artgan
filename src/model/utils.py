@@ -1,5 +1,6 @@
 import json
 import logging
+import torch
 
 class Params:
   """
@@ -70,3 +71,11 @@ def save_dict_to_json(d, json_path):
     # Require conversion of the values to float. It doesn't accept np.array or np.float
     d = {k: float(v) for k, v in d.items()}
     json.dump(d, f, indent=4)
+
+def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
+  if params.use_noise:
+    noise_tensor = torch.randn((batch_size, num_channels_input, image_size, image_size), dtype=torch.float32).to(params.device)
+  else:
+    noise_tensor = None
+  return noise_tensor
+

@@ -10,8 +10,8 @@
   "image_size": 224,
   "num_channels": 3,
   "num_workers": 1,
-  "save_summary_steps": 50,
-  "save_generated_img_steps": 50,
+  "save_summary_steps": 1,
+  "save_generated_img_steps": 1,
   "use_noise": true,
   "patch_size": 70,
   "num_dense_blocks": 6

@@ -125,7 +125,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
 
             # combine the grids
             img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
-            torchvision.utils.save_image(img_grid_combined, os.path.join(output, f'validation_{i}.jpg'))
+            torchvision.utils.save_image(img_grid_combined, os.path.join('output', f'validation_{i}.jpg'))
 
             # write to tensorboard
             writer.add_image('Real Images', img_grid_real)

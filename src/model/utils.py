@@ -1,6 +1,7 @@
 import json
 import logging
 import torch
+import os
 
 class Params:
   """
@@ -136,3 +137,8 @@ def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_
     confidence_D_running /= num_patches
       
   return loss_D_running, confidence_D_running
+
+def create_output_folder():
+  output_path = 'output'
+  if not os.path.exists(output_path):
+    os.makedirs(output_path)

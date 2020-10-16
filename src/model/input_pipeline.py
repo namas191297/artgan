@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
+from model.utils import create_output_folder
 
 train_transform = transforms.Compose([
   transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
@@ -43,6 +44,7 @@ class ArtNetDataset(torch.utils.data.Dataset):
     self.toTensor = transforms.ToTensor()
 
     self.filenames = np.asarray(os.listdir(self.dataset_dir))
+    create_output_folder()
 
   def add_mask(self, img):
     masked_image = img.copy()

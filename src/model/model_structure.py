@@ -51,10 +51,9 @@ def per_pixel_accuracy(real, generated):
   total_pixels += real.nelement()
 
   distance = real - generated
-  offset = 0.05
-  offset = torch.tensor(offset)
+  threshold = torch.tensor(params.threshold_pp_acc)
 
-  correct_pixels = torch.sum(torch.where(distance < offset, torch.tensor(1), torch.tensor(0))).item()
+  correct_pixels = torch.sum(torch.where(distance < threshold, torch.tensor(1), torch.tensor(0))).item()
   pp_acc = correct_pixels / total_pixels
   return pp_acc
 

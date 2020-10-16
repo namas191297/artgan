@@ -63,7 +63,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
         # Generator ##################################################################################################
         loss_G_only, _ = get_discriminator_loss(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G, params.image_size, params.device)
 
-        loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
+        loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss between fake and real images
         loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
 
         # Metrics ####################################################################################################
@@ -115,9 +115,9 @@ def evaluate_session(model_spec, pipeline, writer, params):
             torchvision.utils.save_image(img_grid_combined, os.path.join('output', f'validation_{i}.jpg'))
 
             # write to tensorboard
-            writer.add_image('Real Images', img_grid_real)
-            writer.add_image('Masked Images', img_grid_masked)
-            writer.add_image('Fake Images', img_grid_fake)
+            writer.add_image('Real_Images', img_grid_real)
+            writer.add_image('Masked_Images', img_grid_masked)
+            writer.add_image('Fake_Images', img_grid_fake)
 
         t.update()
 

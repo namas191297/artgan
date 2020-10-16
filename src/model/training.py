@@ -9,10 +9,6 @@ from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
 from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss
 
-
-
-
-
 def train_session(model_spec, pipeline, epoch, writer, params):
   """
   Train the model on batches given by the input pipeline

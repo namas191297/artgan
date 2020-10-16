@@ -124,7 +124,7 @@ def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_
         label = torch.ones(batch_size).to(device)
 
       output = model_D(current_crop_image, current_crop_masked)
-      current_loss = criterion_D(output, label)
+      current_loss = criterion_D(output.squeeze(), label)
 
       if loss_D_running is None:
         loss_D_running = current_loss

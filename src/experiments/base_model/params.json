@@ -5,7 +5,7 @@
   "features_D": 64,
   "features_G": 16,
   "L1_lambda": 100,
-  "batch_size": 16,
+  "batch_size": 10,
   "num_epochs": 30,
   "image_size": 224,
   "num_channels": 3,
@@ -14,6 +14,6 @@
   "save_generated_img_steps": 1,
   "use_noise": true,
   "patch_size": 70,
-  "num_dense_blocks": 6,
+  "num_dense_blocks": 4,
   "threshold_pp_acc": 0.05
 }

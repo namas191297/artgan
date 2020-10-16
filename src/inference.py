@@ -9,7 +9,7 @@ from model.model_structure import model_fn
 from model.evaluation import evaluate
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_dir', type=str, default='experiments/base_model/', help='Experiment directory containing params.json')
+parser.add_argument('--model_dir', type=str, defaultReal_Images='experiments/base_model/', help='Experiment directory containing params.json')
 parser.add_argument('--data_dir', type=str, default='../../../Dataset/ArtNet/', help='Directory containing the dataset')
 parser.add_argument('--restore_from', type=str, default='best_after_epoch_', help='Optional, file containing weights to reload before training')
 

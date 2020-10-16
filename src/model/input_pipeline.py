@@ -67,7 +67,7 @@ class ArtNetDataset(torch.utils.data.Dataset):
 
   def __getitem__(self, idx):
     current_file = self.filenames[idx]
-    self.current_image = Image.open(os.path.join(self.dataset_dir, current_file))
+    self.current_image = Image.open(os.path.join(self.dataset_dir, current_file)).convert('RGB')
     if self.split == 'train':
       real_image = self.train_transform(self.current_image)
     else:

@@ -46,7 +46,7 @@ def model_fn(params):
   return model_spec
 
 
-def per_pixel_accuracy(real, generated):
+def per_pixel_accuracy(real, generated, params):
   total_pixels = 0
   total_pixels += real.nelement()
 

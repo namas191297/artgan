@@ -7,7 +7,6 @@ import math
 
 from model.discriminator import *
 from model.generator import DenseUNet
-from torch.autograd import Variable
 from model.utils import get_random_noise_tensor
 
 
@@ -53,7 +52,7 @@ def per_pixel_accuracy(real, generated, params):
   distance = real - generated
   threshold = torch.tensor(params.threshold_pp_acc)
 
-  correct_pixels = torch.sum(torch.where(distance < threshold, torch.tensor(1), torch.tensor(0))).item()
+  correct_pixels = torch.sum(torch.where(torch.gt(distance, threshold), torch.tensor(1), torch.tensor(0))).item()
   pp_acc = correct_pixels / total_pixels
   return pp_acc
 
@@ -158,42 +157,3 @@ class RunningAverage:
 
   def __call__(self):
     return self.total / float(self.count)
-
-def get_discriminator_outputs(output_D_real, label_D_real):
-  current_batch_size = image_batch_dummy.shape[0]
-  start_index = 0
-  end_index = image_size - patch_size + 1
-  stride = 6
-  num_steps_frac = end_index / stride
-  num_steps = int(num_steps_frac)
-
-  # handle last stride
-  if num_steps_frac - num_steps > 1e-9:
-    end_index += stride
-  loss_D_running = None
-
-  for index_x in range(start_index, end_index, stride):
-    x_start = index_x
-    x_end = x_start + patch_size
-
-    if x_end > image_size:
-      x_start = image_size - patch_size
-      x_end = image_size
-    for index_y in range(start_index, end_index, stride):
-
-      y_start = index_y
-      y_end = y_start + patch_size
-      if y_end > image_size:
-        y_start = image_size - patch_size
-        y_end = image_size
-
-      current_crop_real = output_D_real[:, :, x_start:x_end, y_start:y_end]
-      current_crop_label = label_D_real[:, :, x_start:x_end, y_start:y_end]
-
-      output = model_D(current_crop_real, current_crop_label)
-      current_loss = criterion_D(output_D_real, label_D_real)
-
-      if loss_D_running is None:
-        loss_D_running = current_loss
-      loss_D_running += current_loss
-  return loss_D_running

@@ -9,7 +9,7 @@ from model.training import train_and_validate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', type=str, default='experiments/base_model/', help='Experiment directory containing params.json')
-parser.add_argument('--data_dir', type=str, default='../../../Dataset/ArtNet/', help='Directory containing the dataset')
+parser.add_argument('--data_dir', type=str, default='../../Dataset/ArtNet/', help='Directory containing the dataset')
 parser.add_argument('--restore_from', type=str, default=None, help='Optional, directory or file containing weights to reload before training')
 
 

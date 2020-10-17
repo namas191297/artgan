@@ -9,6 +9,7 @@ from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
 from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss
 
+
 def train_session(model_spec, pipeline, epoch, writer, params):
   """
   Train the model on batches given by the input pipeline
@@ -56,12 +57,14 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       model_D.zero_grad()
 
       # real image
-      loss_D_real, confidence_D = get_discriminator_loss(image_real, image_masked, params.patch_size, 'real_D', model_D, criterion_D, params.image_size, params.device)
+      loss_D_real, confidence_D = get_discriminator_loss(image_real, image_masked, params.patch_size, 'real_D', model_D, criterion_D,
+                                                         params.image_size, params.device)
 
       # fake image
       noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
       fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
-      loss_D_fake, _ = get_discriminator_loss(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D, criterion_D, params.image_size, params.device)
+      loss_D_fake, _ = get_discriminator_loss(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D, criterion_D, params.image_size,
+                                              params.device)
 
       # aggregate discriminator loss
       loss_D = (loss_D_real + loss_D_fake) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning

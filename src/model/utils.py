@@ -3,6 +3,7 @@ import logging
 import torch
 import os
 
+
 class Params:
   """
   Class that loads hyper-parameters from a json file
@@ -73,6 +74,7 @@ def save_dict_to_json(d, json_path):
     d = {k: float(v) for k, v in d.items()}
     json.dump(d, f, indent=4)
 
+
 def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
   noise_tensor = None
   if params.use_noise:
@@ -80,8 +82,8 @@ def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
 
   return noise_tensor
 
-def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
 
+def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
   batch_size = image_real.shape[0]
   start_index = 0
   end_index = image_size - patch_size + 1
@@ -135,8 +137,9 @@ def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_
       num_patches += 1
     loss_D_running /= num_patches
     confidence_D_running /= num_patches
-      
+
   return loss_D_running, confidence_D_running
+
 
 def create_output_folder():
   output_path = 'output'

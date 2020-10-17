@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class DenseBlock(nn.Module):
 
   def __init__(self, num_channels_input, num_hidden_channels):
-    super(DenseBlock, self).__init__()
+    super().__init__()
 
     # 224 x 224 x 6 -> 112 x 112 x 16
     self.down_1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, padding=1)
@@ -110,7 +110,7 @@ class DenseBlock(nn.Module):
 class DenseUNet(nn.Module):
 
   def __init__(self, num_channels_input, num_hidden_channels):
-    super(DenseUNet, self).__init__()
+    super().__init__()
     num_dense_blocks = 6
     self.block_1 = DenseBlock(num_channels_input, num_hidden_channels)
     self.block_2 = DenseBlock(num_channels_input, num_hidden_channels)

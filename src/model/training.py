@@ -132,7 +132,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
 
           # combine the grids
           img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
-          torchvision.utils.save_image(img_grid_combined, os.path.join('output', f'{epoch}_{i}.jpg'))
+          torchvision.utils.save_image(img_grid_combined, os.path.join('outputs', f'{epoch}_{i}.jpg'))
 
           # write to tensorboard
           writer.add_image('Real_Images', img_grid_real)

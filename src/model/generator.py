@@ -3,10 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class DenseBlock(nn.Module):
+class CResBlock(nn.Module):
 
   def __init__(self, num_channels_input, features_G, dropout_ratio=0.5, leak_slope=0.2):
-    super(DenseBlock, self).__init__()
+    super(CResBlock, self).__init__()
     # 224 x 224 x 6 -> 112 x 112 x 16
     self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=features_G, kernel_size=3, padding=1)
     self.bn_down_1 = nn.BatchNorm2d(features_G)
@@ -100,9 +100,9 @@ class DenseBlock(nn.Module):
     return out, layers
 
 
-class DenseUNet(nn.Module):
+class CResUNet(nn.Module):
   def __init__(self, num_channels_input, features_G, num_dense_blocks=4, noise_tensor=None):
-    super(DenseUNet, self).__init__()
+    super(CResUNet, self).__init__()
     self.num_dense_blocks = num_dense_blocks
     self.noise_tensor = noise_tensor
     self.features_G = features_G
@@ -114,12 +114,12 @@ class DenseUNet(nn.Module):
 
     self.num_channels_output = num_channels_input
 
-    self.block_1 = DenseBlock(self.num_channels_input, self.features_G)
-    self.block_2 = DenseBlock(self.num_channels_input, self.features_G)
-    self.block_3 = DenseBlock(self.num_channels_input, self.features_G)
-    self.block_4 = DenseBlock(self.num_channels_input, self.features_G)
-    self.block_5 = DenseBlock(self.num_channels_input, self.features_G)
-    self.block_6 = DenseBlock(self.num_channels_input, self.features_G)
+    self.block_1 = CResBlock(self.num_channels_input, self.features_G)
+    self.block_2 = CResBlock(self.num_channels_input, self.features_G)
+    self.block_3 = CResBlock(self.num_channels_input, self.features_G)
+    self.block_4 = CResBlock(self.num_channels_input, self.features_G)
+    self.block_5 = CResBlock(self.num_channels_input, self.features_G)
+    self.block_6 = CResBlock(self.num_channels_input, self.features_G)
 
     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks * self.num_channels_input,
                                out_channels=self.num_channels_output, kernel_size=1, stride=1)
@@ -168,10 +168,10 @@ class DenseUNet(nn.Module):
 
 #
 #
-# class DenseBlock(nn.Module):
+# class CResBlock(nn.Module):
 #
 #   def __init__(self, num_channels_input, num_hidden_channels, dropout_ratio=0.5, leak_slope=0.2):
-#     super(DenseBlock, self).__init__()
+#     super(CResBlock, self).__init__()
 #
 #     # 224 x 224 x 6 -> 112 x 112 x 16
 #     self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=16, kernel_size=3, padding=1)
@@ -269,22 +269,22 @@ class DenseUNet(nn.Module):
 #     return out, layers
 #
 #
-# class DenseUNet(nn.Module):
+# class CResUNet(nn.Module):
 #
 #   def __init__(self, num_channels_input, num_hidden_channels, noise_tensor=None, num_dense_blocks=4):
-#     super(DenseUNet, self).__init__()
+#     super(CResUNet, self).__init__()
 #     self.num_dense_blocks = num_dense_blocks
 #     self.noise_tensor = noise_tensor
 #
 #     if self.noise_tensor is not None:
 #       num_channels_input *= 2
 #
-#     self.block_1 = DenseBlock(num_channels_input, num_hidden_channels)
-#     self.block_2 = DenseBlock(num_channels_input, num_hidden_channels)
-#     self.block_3 = DenseBlock(num_channels_input, num_hidden_channels)
-#     self.block_4 = DenseBlock(num_channels_input, num_hidden_channels)
-#     self.block_5 = DenseBlock(num_channels_input, num_hidden_channels)
-#     self.block_6 = DenseBlock(num_channels_input, num_hidden_channels)
+#     self.block_1 = CResBlock(num_channels_input, num_hidden_channels)
+#     self.block_2 = CResBlock(num_channels_input, num_hidden_channels)
+#     self.block_3 = CResBlock(num_channels_input, num_hidden_channels)
+#     self.block_4 = CResBlock(num_channels_input, num_hidden_channels)
+#     self.block_5 = CResBlock(num_channels_input, num_hidden_channels)
+#     self.block_6 = CResBlock(num_channels_input, num_hidden_channels)
 #
 #     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks*num_channels_input, out_channels=num_channels_input, kernel_size=1, stride=1)
 #

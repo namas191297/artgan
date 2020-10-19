@@ -142,6 +142,6 @@ def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_
 
 
 def create_output_folder():
-  output_path = 'output'
+  output_path = 'outputs'
   if not os.path.exists(output_path):
     os.makedirs(output_path)

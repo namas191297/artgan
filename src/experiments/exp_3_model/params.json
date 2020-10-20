@@ -3,9 +3,9 @@
   "lr_G": 0.0002,
   "loss_D_factor": 0.5,
   "features_D": 64,
-  "features_G": 16,
+  "features_G": 8,
   "L1_lambda": 100,
-  "batch_size": 24,
+  "batch_size": 10,
   "num_epochs": 30,
   "image_size": 224,
   "num_channels": 3,
@@ -13,9 +13,9 @@
   "save_summary_steps": 1,
   "save_generated_img_steps": 50,
   "use_noise": true,
-  "patch_size": 16,
+  "patch_size": 70,
   "num_dense_blocks": 6,
   "threshold_pp_acc": 0.05,
-  "use_crelu": false,
-  "use_avgpool": false
+  "use_crelu": true,
+  "use_avgpool": true
 }

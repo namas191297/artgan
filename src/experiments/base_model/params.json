@@ -5,7 +5,7 @@
   "features_D": 64,
   "features_G": 16,
   "L1_lambda": 100,
-  "batch_size": 10,
+  "batch_size": 1,
   "num_epochs": 30,
   "image_size": 224,
   "num_channels": 3,
@@ -15,5 +15,7 @@
   "use_noise": true,
   "patch_size": 70,
   "num_dense_blocks": 4,
-  "threshold_pp_acc": 0.05
+  "threshold_pp_acc": 0.05,
+  "use_crelu": true,
+  "use_avgpool": true
 }

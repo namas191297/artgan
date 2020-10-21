@@ -138,8 +138,23 @@ class SSIM(torch.nn.Module):
 #   return sum(loss) / len(loss)
 #
 #
-# def psnr(original, predicted):
-#   pass
+def psnr(real, fake, mse_loss=None):
+  """"
+  mse_loss is a 1D array/list of per image MSE for the batch (can be reused if calculated earlier)
+  real and fake are the image tensors (converted to 0 to 255, BSx3xwxh)
+  """
+  psnrs = []
+  mse = nn.MSELoss()
+  if mse_loss is None:
+    mse_loss = []
+    for i in range(real.size(0)):
+      mse_loss.append(mse(real[i], fake[i]))
+
+  for i in range(real.size(0)):
+    psnrs.append(math.log((255**2)/mse_loss[i], 10))
+
+  return sum(psnrs)/len(psnrs)
+
 
 
 class RunningAverage:

@@ -36,7 +36,7 @@ def model_fn(params):
   losses = {'criterion_G': criterion_G, 'criterion_D': criterion_D, 'L1_criterion_G': L1_criterion_G}
   optimizers = {'optimizer_D': optimizer_D, 'optimizer_G': optimizer_G}
 
-  metrics = {'MSE': nn.MSELoss(), 'SSIM': SSIM(), 'per_pixel_accuracy': per_pixel_accuracy}
+  metrics = {'MSE': nn.MSELoss(), 'SSIM': SSIM(), 'per_pixel_accuracy': per_pixel_accuracy, 'PSNR': psnr}
 
   model_spec = {'models': models,
                 'losses': losses,
@@ -47,6 +47,7 @@ def model_fn(params):
 
 
 def per_pixel_accuracy(real, generated, params):
+  # Todo convert to range
   total_pixels = 0
   total_pixels += real.nelement()
 
@@ -143,6 +144,7 @@ def psnr(real, fake, mse_loss=None):
   mse_loss is a 1D array/list of per image MSE for the batch (can be reused if calculated earlier)
   real and fake are the image tensors (converted to 0 to 255, BSx3xwxh)
   """
+  # Todo convert to range
   psnrs = []
   mse = nn.MSELoss()
   if mse_loss is None:
@@ -156,6 +158,15 @@ def psnr(real, fake, mse_loss=None):
   return sum(psnrs)/len(psnrs)
 
 
+def convert(img, target_type_min, target_type_max, target_type):
+  imin = img.min()
+  imax = img.max()
+
+  a = (target_type_max - target_type_min) / (imax - imin)
+  b = target_type_max - a * imax
+  new_img = (a * img + b).astype(target_type)
+
+  return new_img
 
 class RunningAverage:
   """

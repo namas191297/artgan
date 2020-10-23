@@ -8,7 +8,7 @@ import math
 from model.discriminator import *
 from model.generator import CResUNet
 from model.utils import get_random_noise_tensor, convert
-
+import numpy as np
 
 def model_fn(params):
   """
@@ -51,10 +51,15 @@ def per_pixel_accuracy(real, generated, params):
   total_pixels = 0
   total_pixels += real.nelement()
 
-  distance = real - generated
-  threshold = torch.tensor(params.threshold_pp_acc)
+  real = convert(real.cpu().detach().numpy(), 0, 255, np.uint8)
+  generated = convert(generated.cpu().detach().numpy(), 0, 255, np.uint8)
 
-  correct_pixels = torch.sum(torch.where(torch.gt(distance, threshold), torch.tensor(1), torch.tensor(0))).item()
+  distance = real - generated
+  threshold = params.threshold_pp_acc
+
+  correct_pixels = np.sum(np.where((real - generated)<1, 1, 0))
+  # correct_pixels = np.sum(np.where(, torch.tensor(1), torch.tensor(0))).item()
+
   pp_acc = correct_pixels / total_pixels
   return pp_acc
 

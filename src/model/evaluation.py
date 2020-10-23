@@ -49,21 +49,25 @@ def evaluate_session(model_spec, pipeline, writer, params):
 
         # Discriminator ################################################################################################
         # real image
-        loss_D_real, confidence_D = get_discriminator_loss(image_masked, image_real, params.patch_size, 'real_D', model_D, criterion_D,
+        loss_D_real, confidence_D = get_discriminator_loss(image_real, image_masked, params.patch_size, 'real_D',
+                                                           model_D,
+                                                           criterion_D,
                                                            params.image_size, params.device)
 
         # fake image
         noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
         fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
 
-        loss_D_fake, _ = get_discriminator_loss(fake.detach(), image_real, params.patch_size, 'fake_D', model_D, criterion_D, params.image_size,
+        loss_D_fake, _ = get_discriminator_loss(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D,
+                                                criterion_D, params.image_size,
                                                 params.device)
 
         # aggregate discriminator loss
         loss_D = (loss_D_real + (1-loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
 
         # Generator ##################################################################################################
-        loss_G_only, _ = get_discriminator_loss(fake, image_real, params.patch_size, 'fake_G', model_D, criterion_G, params.image_size,
+        loss_G_only, _ = get_discriminator_loss(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G,
+                                                params.image_size,
                                                 params.device)
 
         loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss between fake and real images

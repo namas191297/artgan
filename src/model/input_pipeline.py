@@ -9,9 +9,9 @@ import cv2
 import random
 
 train_transform = transforms.Compose([
-  transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
+  # transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
   transforms.RandomRotation(10),
-  transforms.Resize((350, 350)),
+  transforms.Resize((256, 256)),
   transforms.RandomCrop((224, 224)),
   transforms.ToTensor(),
   transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),

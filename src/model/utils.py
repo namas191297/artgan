@@ -91,7 +91,36 @@ def convert(source, min_value, max_value, type):
   new_img = (a * source + b).astype(type)
 
   return new_img
-def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
+
+def get_discriminator_loss_conv(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
+  batch_size = image_real.shape[0]
+
+  if patch_size == 224:
+    out_shape = 1
+  elif patch_size == 70:
+    out_shape = 4
+  elif patch_size == 16:
+    out_shape = 14
+  elif patch_size == 1:
+    out_shape = 224
+
+  label = (torch.ones(batch_size, 1, out_shape, out_shape)).to(device)
+  if variant is 'real_D':
+    label *= 0.9
+  elif variant is 'fake_D':
+    label *= 0.1
+  elif variant is 'fake_G':
+    label *= 1
+
+  output = model_D(image_real, image_masked)
+  loss_D = criterion_D(output, label)
+
+  confidence_D = output.mean().item() / out_shape
+  loss_D /= out_shape
+
+  return loss_D, confidence_D
+
+def get_discriminator_loss_strided(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
   batch_size = image_real.shape[0]
   start_index = 0
   end_index = image_size - patch_size + 1

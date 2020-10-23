@@ -108,6 +108,10 @@ def evaluate_session(model_spec, pipeline, writer, params):
             noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
             fake = model_G(image_masked, noise_tensor)
 
+            image_real = (image_real * 0.5 + 0.5)
+            image_masked = (image_masked * 0.5 + 0.5)
+            fake = (fake * 0.5 + 0.5)
+            
             # create image grids for visualization
             img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
             img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))

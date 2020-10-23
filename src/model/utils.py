@@ -115,8 +115,7 @@ def get_discriminator_loss_conv(image_real, image_masked, patch_size, variant, m
   output = model_D(image_real, image_masked)
   loss_D = criterion_D(output, label)
 
-  confidence_D = output.mean().item() / out_shape
-  loss_D /= out_shape
+  confidence_D = output.mean().item()
 
   return loss_D, confidence_D
 

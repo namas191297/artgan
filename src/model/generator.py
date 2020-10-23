@@ -17,19 +17,19 @@ class CResBlock(nn.Module):
   def __init__(self, num_channels_input, features_G, dropout_ratio=0.5, leaky_slope=0.2, use_crelu=False, use_avgpool=False):
     super(CResBlock, self).__init__()
     # 224 x 224 x 6 -> 112 x 112 x 16
-    self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=features_G, kernel_size=3, padding=1)
+    self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=features_G, kernel_size=3, padding=1, stride=2)
     self.bn_down_1 = nn.BatchNorm2d(features_G)
 
     if use_crelu:
       features_G *= 2
 
-    self.conv_down_2 = nn.Conv2d(in_channels=features_G, out_channels=features_G * 2, kernel_size=3, padding=1)
+    self.conv_down_2 = nn.Conv2d(in_channels=features_G, out_channels=features_G * 2, kernel_size=3, padding=1, stride=2)
     self.bn_down_2 = nn.BatchNorm2d(features_G * 2)
 
     if use_crelu:
       features_G *= 2
 
-    self.conv_down_3 = nn.Conv2d(in_channels=features_G * 2, out_channels=features_G * 4, kernel_size=3, padding=1)
+    self.conv_down_3 = nn.Conv2d(in_channels=features_G * 2, out_channels=features_G * 4, kernel_size=3, padding=1, stride=2)
     self.bn_down_3 = nn.BatchNorm2d(features_G * 4)
 
     if use_crelu:
@@ -88,21 +88,21 @@ class CResBlock(nn.Module):
       res_up_3, res_up_2, res_up_1 = res_layers
 
       # 112 x 112 x 16
-      down_1 = self.pool2d(self.alt_relu(self.bn_down_1(self.conv_down_1(input))))
+      down_1 = self.alt_relu(self.bn_down_1(self.conv_down_1(input)))
       # 112 x 112 x (16 + 48)
       down_1 = torch.cat((down_1, res_up_1), 1)
       # 112 x 112 x 16
       down_1 = self.res_bottleneck_1(down_1)
 
       # 56 x 56 x 32
-      down_2 = self.pool2d(self.alt_relu(self.bn_down_2(self.conv_down_2(down_1))))
+      down_2 = self.alt_relu(self.bn_down_2(self.conv_down_2(down_1)))
       # 56 x 56 x (32 + 96)
       down_2 = torch.cat((down_2, res_up_2), 1)
       # 56 x 56 x 32
       down_2 = self.res_bottleneck_2(down_2)
 
       # 28 x 28 x 64
-      down_3 = self.pool2d(self.alt_relu(self.bn_down_3(self.conv_down_3(down_2))))
+      down_3 = self.alt_relu(self.bn_down_3(self.conv_down_3(down_2)))
       # 28 x 28 x (64 + 80)
       down_3 = torch.cat((down_3, res_up_3), 1)
       # 28 x 28 x 64
@@ -110,11 +110,11 @@ class CResBlock(nn.Module):
 
     else:
       # 112 x 112 x 16
-      down_1 = self.pool2d(self.alt_relu(self.bn_down_1(self.conv_down_1(input))))
+      down_1 = self.alt_relu(self.bn_down_1(self.conv_down_1(input)))
       # 56 x 56 x 32
-      down_2 = self.pool2d(self.alt_relu(self.bn_down_2(self.conv_down_2(down_1))))
+      down_2 = self.alt_relu(self.bn_down_2(self.conv_down_2(down_1)))
       # 28 x 28 x 64
-      down_3 = self.pool2d(self.alt_relu(self.bn_down_3(self.conv_down_3(down_2))))
+      down_3 = self.alt_relu(self.bn_down_3(self.conv_down_3(down_2)))
 
     # 28 x 28 x 16
     bottleneck = self.bottleneck_1(down_3)
@@ -162,7 +162,6 @@ class CResUNet(nn.Module):
 
     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks * self.num_channels_input,
                                out_channels=self.num_channels_output, kernel_size=1, stride=1)
-    self.tanh = nn.Tanh()
 
   def forward(self, image_masked, noise_tensor=None):
 
@@ -204,7 +203,7 @@ class CResUNet(nn.Module):
     else:
       raise NotImplementedError
 
-    return self.tanh(out_final)
+    return out_final
 
 #
 #

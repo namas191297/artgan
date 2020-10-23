@@ -162,6 +162,7 @@ class CResUNet(nn.Module):
 
     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks * self.num_channels_input,
                                out_channels=self.num_channels_output, kernel_size=1, stride=1)
+    self.tanh = nn.Tanh()
 
   def forward(self, image_masked, noise_tensor=None):
 
@@ -203,7 +204,7 @@ class CResUNet(nn.Module):
     else:
       raise NotImplementedError
 
-    return out_final
+    return self.tanh(out_final)
 
 #
 #

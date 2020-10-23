@@ -36,7 +36,7 @@ class ArtNetDataset(torch.utils.data.Dataset):
     # Initialize certain variables that will be used later.
     assert split in ['train', 'validation', 'test'], 'Error: Inserted incorrect set. Valid sets are case-sensitive = train or validation or test'
     self.dataset_dir = dataset_dir
-    self.mask_sizes = [(32, 32), (64, 64), (128, 128)]
+    self.mask_sizes = [(64, 64), (96, 96), (128, 128)]
     self.mask_dir = mask_dir
     self.split = split
 

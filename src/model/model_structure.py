@@ -7,7 +7,7 @@ import math
 
 from model.discriminator import *
 from model.generator import CResUNet
-from model.utils import get_random_noise_tensor
+from model.utils import get_random_noise_tensor, convert
 
 
 def model_fn(params):
@@ -156,17 +156,6 @@ def psnr(real, fake, mse_loss=None):
     psnrs.append(math.log((255**2)/mse_loss[i], 10))
 
   return sum(psnrs)/len(psnrs)
-
-
-def convert(img, target_type_min, target_type_max, target_type):
-  imin = img.min()
-  imax = img.max()
-
-  a = (target_type_max - target_type_min) / (imax - imin)
-  b = target_type_max - a * imax
-  new_img = (a * img + b).astype(target_type)
-
-  return new_img
 
 class RunningAverage:
   """

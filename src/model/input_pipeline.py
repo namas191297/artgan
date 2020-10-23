@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
-from model.utils import create_output_folder
+from model.utils import create_output_folder, convert
 import cv2
 import random
 
@@ -50,16 +50,6 @@ class ArtNetDataset(torch.utils.data.Dataset):
     self.filenames = np.asarray(os.listdir(self.dataset_dir))
     create_output_folder()
 
-  def convert(self, img, target_type_min, target_type_max, target_type):
-    imin = img.min()
-    imax = img.max()
-
-    a = (target_type_max - target_type_min) / (imax - imin)
-    b = target_type_max - a * imax
-    new_img = (a * img + b).astype(target_type)
-
-    return new_img
-
   def add_mask(self, img):
     masked_image = np.array(img.cpu().detach().permute(1, 2, 0).numpy())
     height, width, num_channels = masked_image.shape
@@ -102,9 +92,9 @@ class ArtNetDataset(torch.utils.data.Dataset):
 
     # res = cv2.bitwise_and(img, img)
     # mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
-    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0], self.convert(mask, -1, 1, np.float32))
-    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1], self.convert(mask, -1, 1, np.float32))
-    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2], self.convert(mask, -1, 1, np.float32))
+    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0], convert(mask, -1, 1, np.float32))
+    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1], convert(mask, -1, 1, np.float32))
+    masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2], convert(mask, -1, 1, np.float32))
 
     # plt.figure(figsize=(10, 10))
     # plt.imshow(masked_image* 0.5 + 0.5)

@@ -82,7 +82,15 @@ def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
 
   return noise_tensor
 
+def convert(source, min_value, max_value, type):
+  smin = source.min()
+  smax = source.max()
 
+  a = (max_value - min_value) / (smax - smin)
+  b = max_value - a * smax
+  new_img = (a * source + b).astype(type)
+
+  return new_img
 def get_discriminator_loss(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
   batch_size = image_real.shape[0]
   start_index = 0

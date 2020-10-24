@@ -213,11 +213,10 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
   :param params: (Params), contains hyper-parameters of the model. Must define: num_epochs, batch_size, save_summary_steps, ... etc
   """
   if restore_from is not None:
-    checkpoint = os.path.join(model_dir, restore_from)
-    if not os.path.exists(checkpoint):
-      raise ("File {} doesn't exist".format(checkpoint))
+    if not os.path.exists(restore_from):
+      raise FileNotFoundError("File {} doesn't exist".format(restore_from))
 
-    checkpoint = torch.load(checkpoint)
+    checkpoint = torch.load(restore_from)
 
     model_spec['models']['model_G_c'].load_state_dict(checkpoint['G_c_state_dict'])
     model_spec['models']['model_G_r'].load_state_dict(checkpoint['G_r_state_dict'])

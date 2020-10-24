@@ -6,7 +6,8 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv, get_discriminator_loss
+from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, \
+  get_discriminator_loss_conv, get_discriminator_loss
 from model.model_structure import RunningAverage
 
 
@@ -64,23 +65,23 @@ def evaluate_session(model_spec, pipeline, writer, params):
 
         # real image coarse
         fake_coarse, loss_D_c, model_D_c, model_G_c, confidence_D_c = get_discriminator_loss(image_real,
-                                                                                                            image_masked,
-                                                                                                            model_D_c,
-                                                                                                            model_G_c,
-                                                                                                            criterion_D,
-                                                                                                            batch_size,
-                                                                                                            params)
+                                                                                             image_masked,
+                                                                                             model_D_c,
+                                                                                             model_G_c,
+                                                                                             criterion_D,
+                                                                                             batch_size,
+                                                                                             params)
 
         coarse_image = fake_coarse.detach()
         # real image refined
         fake_refined, loss_D_r, model_D_r, model_G_r, confidence_D_r = get_discriminator_loss(image_real,
-                                                                                                             image_masked,
-                                                                                                             model_D_r,
-                                                                                                             model_G_r,
-                                                                                                             criterion_D,
-                                                                                                             batch_size,
-                                                                                                             params,
-                                                                                                             coarse_image)
+                                                                                              image_masked,
+                                                                                              model_D_r,
+                                                                                              model_G_r,
+                                                                                              criterion_D,
+                                                                                              batch_size,
+                                                                                              params,
+                                                                                              coarse_image)
 
         # Generator ##################################################################################################
         loss_G_c_only, _ = get_discriminator_loss_conv(fake_coarse, image_masked, params.patch_size, 'fake_G',
@@ -182,21 +183,21 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   :param restore_from: (String), Directory of file containing weights to restore the graph
   """
   # Reload weights from the saved file
-  best_weights_dir = os.path.join(model_dir, 'best_weights')
-  checkpoints = os.listdir(best_weights_dir)
-  best_epochs = []
   test_writer = SummaryWriter(os.path.join(model_dir, 'test_summaries'))
 
-  for c in checkpoints:
-    best_epochs.append(c.split('.')[0].split('_')[-1])
-
-  checkpoint = os.path.join(model_dir, 'best_weights', restore_from + '{}.pth.tar'.format(best_epochs[-1]))
+  checkpoint = os.path.join(model_dir, restore_from)
   if not os.path.exists(checkpoint):
-    raise ("File doesn't exist {}".format(checkpoint))
+    raise ("File {} doesn't exist".format(checkpoint))
 
   checkpoint = torch.load(checkpoint)
-  model_spec['models']['model_G'].load_state_dict(checkpoint['G_state_dict'])
-  model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
+  model_spec['models']['model_G_c'].load_state_dict(checkpoint['G_c_state_dict'])
+  model_spec['models']['model_G_r'].load_state_dict(checkpoint['G_r_state_dict'])
+  model_spec['optimizers']['optimizer_G_c'].load_state_dict(checkpoint['G_c_optim_dict'])
+  model_spec['optimizers']['optimizer_G_r'].load_state_dict(checkpoint['G_r_optim_dict'])
+  model_spec['models']['model_D_c'].load_state_dict(checkpoint['D_c_state_dict'])
+  model_spec['models']['model_D_r'].load_state_dict(checkpoint['D_r_state_dict'])
+  model_spec['optimizers']['optimizer_D_c'].load_state_dict(checkpoint['D_c_optim_dict'])
+  model_spec['optimizers']['optimizer_D_c'].load_state_dict(checkpoint['D_r_optim_dict'])
 
   # Inference
   test_metrics = evaluate_session(model_spec, pipeline, test_writer, params)

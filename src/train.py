@@ -48,7 +48,7 @@ def main():
   logging.info("Building completed!")
 
   logging.info("Initiate training procedure!")
-  train_and_validate(model_spec, train_pipeline, valid_pipeline, args.model_dir, params)
+  train_and_validate(model_spec, train_pipeline, valid_pipeline, args.model_dir, params, args.restore_from)
   logging.info("Training completed!")
 
 

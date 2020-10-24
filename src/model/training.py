@@ -7,7 +7,9 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
-from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv, get_discriminator_loss
+from model.utils import save_checkpoint_and_weights, get_random_noise_tensor, get_discriminator_loss_strided, \
+  get_discriminator_loss_conv, get_discriminator_loss
+
 
 def train_session(model_spec, pipeline, epoch, writer, params):
   """
@@ -65,7 +67,10 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       model_D_r.zero_grad()
 
       # real image coarse
-      fake_coarse, loss_D_c, model_D_c, model_G_c, confidence_D_c = get_discriminator_loss(image_real, image_masked, model_D_c, model_G_c, criterion_D, batch_size, params)
+      fake_coarse, loss_D_c, model_D_c, model_G_c, confidence_D_c = get_discriminator_loss(image_real, image_masked,
+                                                                                           model_D_c, model_G_c,
+                                                                                           criterion_D, batch_size,
+                                                                                           params)
 
       # update discriminator weights
       loss_D_c.backward()
@@ -73,7 +78,10 @@ def train_session(model_spec, pipeline, epoch, writer, params):
 
       coarse_image = fake_coarse.detach()
       # real image refined
-      fake_refined, loss_D_r, model_D_r, model_G_r, confidence_D_r = get_discriminator_loss(image_real, image_masked, model_D_r, model_G_r, criterion_D, batch_size, params, coarse_image)
+      fake_refined, loss_D_r, model_D_r, model_G_r, confidence_D_r = get_discriminator_loss(image_real, image_masked,
+                                                                                            model_D_r, model_G_r,
+                                                                                            criterion_D, batch_size,
+                                                                                            params, coarse_image)
 
       # update discriminator weights
       loss_D_r.backward()
@@ -84,16 +92,17 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       model_G_r.zero_grad()
 
       loss_G_c_only, _ = get_discriminator_loss_conv(fake_coarse, image_masked, params.patch_size, 'fake_G', model_D_c,
-                                                   criterion_G,
-                                                   params.image_size,
-                                                   params.device)
+                                                     criterion_G,
+                                                     params.image_size,
+                                                     params.device)
 
-      loss_G_r_only, _ = get_discriminator_loss_conv(fake_refined, image_masked, params.patch_size, 'fake_G', model_D_r, criterion_G,
-                                                      params.image_size,
-                                                      params.device)
+      loss_G_r_only, _ = get_discriminator_loss_conv(fake_refined, image_masked, params.patch_size, 'fake_G', model_D_r,
+                                                     criterion_G,
+                                                     params.image_size,
+                                                     params.device)
 
       loss_G_c_L1 = L1_criterion_G(fake_coarse, image_real)  # L1 loss beterrn fake and real images
-      loss_G_c = loss_G_c_only  * params.L1_lambda + loss_G_c_L1  # aggregated generator loss
+      loss_G_c = loss_G_c_only * params.L1_lambda + loss_G_c_L1  # aggregated generator loss
 
       # update generator weights
       loss_G_c.backward()
@@ -105,8 +114,6 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       # update generator weights
       loss_G_r.backward()
       optimizer_G_r.step()
-
-
 
       # Metrics ####################################################################################################
       # extract data from torch Tensors, move to cpu
@@ -125,7 +132,8 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       # Evaluate summaries only once in a while
       # if i % params.save_summary_steps == 0:
       # store per batch metrics for the epoch results
-      summary_batch = {'loss_D_c': loss_D_c.item(), 'loss_D_r': loss_D_r.item(), 'loss_G_c': loss_G_c.item(), 'loss_G_r': loss_G_r.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
+      summary_batch = {'loss_D_c': loss_D_c.item(), 'loss_D_r': loss_D_r.item(), 'loss_G_c': loss_G_c.item(),
+                       'loss_G_r': loss_G_r.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
       summ.append(summary_batch)
 
       # update the average losses for both discriminator and generator
@@ -152,7 +160,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
           fake_refined = model_G_r(image_masked, fake_coarse)
 
           # unnormalize
-          image_real = (image_real*0.5+0.5)
+          image_real = (image_real * 0.5 + 0.5)
           image_masked = (image_masked * 0.5 + 0.5)
           fake_coarse = (fake_coarse * 0.5 + 0.5)
           fake_refined = (fake_refined * 0.5 + 0.5)
@@ -181,10 +189,20 @@ def train_session(model_spec, pipeline, epoch, writer, params):
 
   logging.info("Training Session Finished")
 
-  return metrics_mean
+  # pass the updated values back to the dictionary
+  model_spec['models']['model_G_c'] = model_G_c
+  model_spec['models']['model_G_r'] = model_G_r
+  model_spec['models']['model_D_c'] = model_D_c
+  model_spec['models']['model_D_r'] = model_D_r
+  model_spec['optimizers']['optimizer_D_c'] = optimizer_D_c
+  model_spec['optimizers']['optimizer_D_r'] = optimizer_D_r
+  model_spec['optimizers']['optimizer_G_c'] = optimizer_G_c
+  model_spec['optimizers']['optimizer_G_r'] = optimizer_G_r
+
+  return metrics_mean, model_spec
 
 
-def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, params):
+def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, params, restore_from=None):
   """
   Train the model and validate every epoch
 
@@ -194,7 +212,26 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
   :param model_dir: (String), directory containing config, weights and logs
   :param params: (Params), contains hyper-parameters of the model. Must define: num_epochs, batch_size, save_summary_steps, ... etc
   """
-  begin_at_epoch = 0
+  if restore_from is not None:
+    checkpoint = os.path.join(model_dir, restore_from)
+    if not os.path.exists(checkpoint):
+      raise ("File {} doesn't exist".format(checkpoint))
+
+    checkpoint = torch.load(checkpoint)
+
+    model_spec['models']['model_G_c'].load_state_dict(checkpoint['G_c_state_dict'])
+    model_spec['models']['model_G_r'].load_state_dict(checkpoint['G_r_state_dict'])
+    model_spec['optimizers']['optimizer_G_c'].load_state_dict(checkpoint['G_c_optim_dict'])
+    model_spec['optimizers']['optimizer_G_r'].load_state_dict(checkpoint['G_r_optim_dict'])
+    model_spec['models']['model_D_c'].load_state_dict(checkpoint['D_c_state_dict'])
+    model_spec['models']['model_D_r'].load_state_dict(checkpoint['D_r_state_dict'])
+    model_spec['optimizers']['optimizer_D_c'].load_state_dict(checkpoint['D_c_optim_dict'])
+    model_spec['optimizers']['optimizer_D_c'].load_state_dict(checkpoint['D_r_optim_dict'])
+
+    begin_at_epoch = checkpoint['epoch']
+  else:
+    begin_at_epoch = 0
+
   best_valid_loss_G = np.Infinity
   # For tensorBoard (takes care of writing summaries to files)
   train_writer = SummaryWriter(os.path.join(model_dir, 'train_summaries'))
@@ -205,7 +242,7 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
     logging.info("Epoch {}/{}".format(epoch + 1, params.num_epochs))
 
     # compute number of batches in one epoch (one full pass over the training dataset)
-    train_mean_metrics = train_session(model_spec, train_pipeline, epoch, train_writer, params)
+    train_mean_metrics, train_model_spec = train_session(model_spec, train_pipeline, epoch, train_writer, params)
 
     for k, v in train_mean_metrics.items():
       train_writer.add_scalar(k, v, global_step=epoch + 1)
@@ -217,36 +254,26 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
 
     valid_loss_G = valid_mean_metrics['loss_G_r']
 
+    save_dict = {'epoch': epoch + 1,
+                 'G_c_state_dict': train_model_spec['models']['model_G_c'],
+                 'G_r_state_dict': train_model_spec['models']['model_G_r'],
+                 'G_c_optim_dict': train_model_spec['optimizers']['optimizer_G_c'],
+                 'G_r_optim_dict': train_model_spec['optimizers']['optimizer_G_r'],
+                 'D_c_state_dict': train_model_spec['models']['model_D_c'],
+                 'D_r_state_dict': train_model_spec['models']['model_D_r'],
+                 'D_c_optim_dict': train_model_spec['optimizers']['optimizer_D_c'],
+                 'D_r_optim_dict': train_model_spec['optimizers']['optimizer_D_r']
+                 }
+
     if valid_loss_G <= best_valid_loss_G:
       # Store new best loss
       best_valid_loss_G = valid_loss_G
-      # Save weights
-      best_save_directory = os.path.join(model_dir, 'best_weights')
-      if not os.path.exists(best_save_directory):
-        os.mkdir(best_save_directory)
-      # Removes previously stored best model since we found a new one
-      files = os.listdir(best_save_directory)
-      if len(files) != 0:
-        os.remove(os.path.join(best_save_directory, files[0]))
 
-      best_save_path = os.path.join(best_save_directory, 'best_after_epoch_{}.pth.tar'.format(epoch + 1))
+      save_checkpoint_and_weights(model_dir, save_dict, epoch, valid_mean_metrics, checkpoint='best')
 
-      torch.save({'epoch': epoch + 1,
-                  'G_c_state_dict': model_spec['models']['model_G_c'].state_dict(),
-                  'G_r_state_dict': model_spec['models']['model_G_r'].state_dict(),
-                  'G_c_optim_dict': model_spec['optimizers']['optimizer_G_c'].state_dict(),
-                  'G_r_optim_dict': model_spec['optimizers']['optimizer_G_r'].state_dict(),
-                  'D_c_state_dict': model_spec['models']['model_D_c'].state_dict(),
-                  'D_r_state_dict': model_spec['models']['model_D_r'].state_dict(),
-                  'D_c_optim_dict': model_spec['optimizers']['optimizer_D_c'].state_dict(),
-                  'D_r_optim_dict': model_spec['optimizers']['optimizer_D_c'].state_dict()},
-                 best_save_path)
+      logging.info("Found new best accuracy, after epoch {}".format(epoch + 1))
 
-      logging.info("Found new best accuracy, saving in {}".format(best_save_path))
-
-      # Save best eval metrics in a json file in the model directory
-      best_json_path = os.path.join(model_dir, 'metrics_eval_best_weights.json')
-      save_dict_to_json(valid_mean_metrics, best_json_path)
+    save_checkpoint_and_weights(model_dir, save_dict, epoch, valid_mean_metrics, checkpoint='last')
 
   train_writer.flush()
   eval_writer.flush()

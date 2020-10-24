@@ -6,7 +6,8 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv
+from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, \
+  get_discriminator_loss_conv
 from model.model_structure import RunningAverage
 
 
@@ -50,25 +51,27 @@ def evaluate_session(model_spec, pipeline, writer, params):
         # Discriminator ################################################################################################
         # real image
         loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D',
-                                                                   model_D,
-                                                                   criterion_D,
-                                                                   params.image_size, params.device)
+                                                                model_D,
+                                                                criterion_D,
+                                                                params.image_size, params.device)
 
         # fake image
         noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
         fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
 
         loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D,
-                                                        criterion_D, params.image_size,
-                                                        params.device)
+                                                     criterion_D, params.image_size,
+                                                     params.device)
 
         # aggregate discriminator loss
-        loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+        loss_D = (loss_D_real + (
+          loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
 
         # Generator ##################################################################################################
-        loss_G_only, _ = get_discriminator_loss_conv(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G,
-                                                        params.image_size,
-                                                        params.device)
+        loss_G_only, _ = get_discriminator_loss_conv(fake, image_masked, params.patch_size, 'fake_G', model_D,
+                                                     criterion_G,
+                                                     params.image_size,
+                                                     params.device)
 
         loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss between fake and real images
         loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
@@ -90,7 +93,8 @@ def evaluate_session(model_spec, pipeline, writer, params):
         # Evaluate summaries only once in a while
         # if i % params.save_summary_steps == 0:
         # store per batch metrics for the epoch results
-        summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
+        summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(),
+                         'ssim': ssim.item()}
         summ.append(summary_batch)
 
         # update the average losses for both discriminator ang generator
@@ -152,15 +156,9 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   :param restore_from: (String), Directory of file containing weights to restore the graph
   """
   # Reload weights from the saved file
-  best_weights_dir = os.path.join(model_dir, 'best_weights')
-  checkpoints = os.listdir(best_weights_dir)
-  best_epochs = []
   test_writer = SummaryWriter(os.path.join(model_dir, 'test_summaries'))
 
-  for c in checkpoints:
-    best_epochs.append(c.split('.')[0].split('_')[-1])
-
-  checkpoint = os.path.join(model_dir, 'best_weights', restore_from + '{}.pth.tar'.format(best_epochs[-1]))
+  checkpoint = os.path.join(model_dir, restore_from)
   if not os.path.exists(checkpoint):
     raise ("File doesn't exist {}".format(checkpoint))
 

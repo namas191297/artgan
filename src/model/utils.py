@@ -75,12 +75,33 @@ def save_dict_to_json(d, json_path):
     json.dump(d, f, indent=4)
 
 
+def save_checkpoint_and_weights(model_dir, save_dict, epoch, valid_mean_metrics, checkpoint):
+  # Save weights
+  save_directory = os.path.join(model_dir, checkpoint + '_weights')
+  if not os.path.exists(save_directory):
+    os.mkdir(save_directory)
+  # Removes previously stored model since we found a new one
+  files = os.listdir(save_directory)
+  if len(files) != 0:
+    os.remove(os.path.join(save_directory, files[0]))
+
+  save_path = os.path.join(save_directory, checkpoint + '_after_epoch_{}.pth.tar'.format(epoch + 1))
+
+  torch.save(save_dict, save_path)
+
+  # Save eval metrics in a json file in the model directory
+  json_path = os.path.join(model_dir, 'metrics_eval_' + checkpoint + '_weights.json')
+  save_dict_to_json(valid_mean_metrics, json_path)
+
+
 def get_random_noise_tensor(batch_size, num_channels_input, image_size, params):
   noise_tensor = None
   if params.use_noise:
-    noise_tensor = torch.randn((batch_size, num_channels_input, image_size, image_size), dtype=torch.float32).to(params.device)
+    noise_tensor = torch.randn((batch_size, num_channels_input, image_size, image_size), dtype=torch.float32).to(
+      params.device)
 
   return noise_tensor
+
 
 def convert(source, min_value, max_value, type):
   smin = source.min()
@@ -92,7 +113,9 @@ def convert(source, min_value, max_value, type):
 
   return new_img
 
-def get_discriminator_loss_conv(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
+
+def get_discriminator_loss_conv(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size,
+                                device):
   batch_size = image_real.shape[0]
 
   if patch_size == 224:
@@ -119,7 +142,9 @@ def get_discriminator_loss_conv(image_real, image_masked, patch_size, variant, m
 
   return loss_D, confidence_D
 
-def get_discriminator_loss_strided(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size, device):
+
+def get_discriminator_loss_strided(image_real, image_masked, patch_size, variant, model_D, criterion_D, image_size,
+                                   device):
   batch_size = image_real.shape[0]
   start_index = 0
   end_index = image_size - patch_size + 1

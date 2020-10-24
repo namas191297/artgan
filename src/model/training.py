@@ -7,30 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
-from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv
-
-def get_discriminator_loss(image_real, image_masked, model_D, model_G, criterion_D, batch_size, optimizer_D, params, noise_tensor=None):
-  loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D',
-                                                          model_D,
-                                                          criterion_D,
-                                                          params.image_size, params.device)
-
-  # fake image
-  if noise_tensor is None:
-    noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
-  fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
-
-  loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D',
-                                               model_D,
-                                               criterion_D, params.image_size,
-                                               params.device)
-
-  # aggregate discriminator loss
-  loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
-
-  return fake, loss_D, model_D, model_G, optimizer_D, confidence_D
-
-
+from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv, get_discriminator_loss
 
 def train_session(model_spec, pipeline, epoch, writer, params):
   """
@@ -88,7 +65,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       model_D_r.zero_grad()
 
       # real image coarse
-      fake_coarse, loss_D_c, model_D_c, model_G_c, optimizer_D_c, confidence_D_c = get_discriminator_loss(image_real, image_masked, model_D_c, model_G_c, criterion_D, batch_size, optimizer_D_c, params)
+      fake_coarse, loss_D_c, model_D_c, model_G_c, confidence_D_c = get_discriminator_loss(image_real, image_masked, model_D_c, model_G_c, criterion_D, batch_size, params)
 
       # update discriminator weights
       loss_D_c.backward()
@@ -96,7 +73,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
 
       coarse_image = fake_coarse.detach()
       # real image refined
-      fake_refined, loss_D_r, model_D_r, model_G_r, optimizer_D_r, confidence_D_r = get_discriminator_loss(image_real, image_masked, model_D_r, model_G_r, criterion_D, batch_size, optimizer_D_r, params, coarse_image)
+      fake_refined, loss_D_r, model_D_r, model_G_r, confidence_D_r = get_discriminator_loss(image_real, image_masked, model_D_r, model_G_r, criterion_D, batch_size, params, coarse_image)
 
       # update discriminator weights
       loss_D_r.backward()
@@ -166,7 +143,6 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       t.set_postfix(confidence_D_r='{:05.3f}'.format(confidence_D_r), loss_D_r='{:05.3f}'.format(average_loss_D_r()),
                     loss_G_r='{:05.3f}'.format(average_loss_G_r()), pp_acc='{:05.3f}'.format(average_per_pixel_acc()),
                     mse='{:05.3f}'.format(average_mse()), ssim='{:05.3f}'.format(average_ssim()))
-
       # 3 image grids
       if i % params.save_generated_img_steps == 0:
         with torch.no_grad():

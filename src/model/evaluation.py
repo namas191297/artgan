@@ -6,7 +6,7 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv
+from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv, get_discriminator_loss
 from model.model_structure import RunningAverage
 
 
@@ -20,21 +20,32 @@ def evaluate_session(model_spec, pipeline, writer, params):
   :param params: (Params), contains hyper-parameters of the model. Must define: num_epochs, batch_size, save_summary_steps, ... etc
   :return: (dict) the batch mean metrics - loss and accuracy etc
   """
-  model_G = model_spec['models']['model_G']
-  model_D = model_spec['models']['model_D']
+  model_G_c = model_spec['models']['model_G_c']
+  model_G_r = model_spec['models']['model_G_r']
+  model_D_c = model_spec['models']['model_D_c']
+  model_D_r = model_spec['models']['model_D_r']
 
   criterion_D = model_spec['losses']['criterion_D']
   criterion_G = model_spec['losses']['criterion_G']
   L1_criterion_G = model_spec['losses']['L1_criterion_G']
 
+  optimizer_D_c = model_spec['optimizers']['optimizer_D_c']
+  optimizer_D_r = model_spec['optimizers']['optimizer_D_r']
+  optimizer_G_c = model_spec['optimizers']['optimizer_G_c']
+  optimizer_G_r = model_spec['optimizers']['optimizer_G_r']
+
   criterion_mse = model_spec['metrics']['MSE']
   criterion_ssim = model_spec['metrics']['SSIM']
   criterion_pp_acc = model_spec['metrics']['per_pixel_accuracy']
 
-  # summary for current evaluation loop and a running average object for loss
+  # set model to training mode
+  model_G_c.train()
+  model_G_r.train()
+  model_D_c.train()
+  model_D_r.train()
+
+  # summary for current training loop and a running average object for loss
   summ = []
-  average_loss_D = RunningAverage()
-  average_loss_G = RunningAverage()
   average_per_pixel_acc = RunningAverage()
   average_mse = RunningAverage()
   average_ssim = RunningAverage()
@@ -52,39 +63,26 @@ def evaluate_session(model_spec, pipeline, writer, params):
         model_D_r.zero_grad()
 
         # real image coarse
-        fake_coarse, loss_D_c, model_D_c, model_G_c, optimizer_D_c, confidence_D_c = get_discriminator_loss(image_real,
+        fake_coarse, loss_D_c, model_D_c, model_G_c, confidence_D_c = get_discriminator_loss(image_real,
                                                                                                             image_masked,
                                                                                                             model_D_c,
                                                                                                             model_G_c,
                                                                                                             criterion_D,
                                                                                                             batch_size,
-                                                                                                            optimizer_D_c,
                                                                                                             params)
-
-        # update discriminator weights
-        loss_D_c.backward()
-        optimizer_D_c.step()
 
         coarse_image = fake_coarse.detach()
         # real image refined
-        fake_refined, loss_D_r, model_D_r, model_G_r, optimizer_D_r, confidence_D_r = get_discriminator_loss(image_real,
+        fake_refined, loss_D_r, model_D_r, model_G_r, confidence_D_r = get_discriminator_loss(image_real,
                                                                                                              image_masked,
                                                                                                              model_D_r,
                                                                                                              model_G_r,
                                                                                                              criterion_D,
                                                                                                              batch_size,
-                                                                                                             optimizer_D_r,
                                                                                                              params,
                                                                                                              coarse_image)
 
-        # update discriminator weights
-        loss_D_r.backward()
-        optimizer_D_r.step()
-
         # Generator ##################################################################################################
-        model_G_c.zero_grad()
-        model_G_r.zero_grad()
-
         loss_G_c_only, _ = get_discriminator_loss_conv(fake_coarse, image_masked, params.patch_size, 'fake_G',
                                                        model_D_c,
                                                        criterion_G,

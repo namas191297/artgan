@@ -181,3 +181,24 @@ def create_output_folder():
   output_path = 'outputs'
   if not os.path.exists(output_path):
     os.makedirs(output_path)
+
+def get_discriminator_loss(image_real, image_masked, model_D, model_G, criterion_D, batch_size, params, noise_tensor=None):
+  loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D',
+                                                          model_D,
+                                                          criterion_D,
+                                                          params.image_size, params.device)
+
+  # fake image
+  if noise_tensor is None:
+    noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
+  fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
+
+  loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D',
+                                               model_D,
+                                               criterion_D, params.image_size,
+                                               params.device)
+
+  # aggregate discriminator loss
+  loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+
+  return fake, loss_D, model_D, model_G, confidence_D

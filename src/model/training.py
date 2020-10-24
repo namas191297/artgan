@@ -174,7 +174,6 @@ def train_session(model_spec, pipeline, epoch, writer, params):
           writer.add_image('Fake_Images', img_grid_fake_r)
 
       t.update()
-      break
   # compute mean of all metrics in summary
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())

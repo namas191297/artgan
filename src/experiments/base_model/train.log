@@ -1,0 +1,513 @@
+2020-10-23 21:48:26,335:INFO:Creating input pipelines...:
+2020-10-23 22:01:29,475:INFO:Creating input pipelines...:
+2020-10-23 22:01:29,477:INFO:Completed (Training Dataset)!:
+2020-10-23 22:01:29,477:INFO:Completed (Validation Dataset)!:
+2020-10-23 22:01:29,477:INFO:Building network model...:
+2020-10-23 22:01:29,819:INFO:Building completed!:
+2020-10-23 22:01:29,819:INFO:Initiate training procedure!:
+2020-10-23 22:01:29,823:INFO:Epoch 1/30:
+2020-10-23 22:01:29,825:INFO:Training Session Running...:
+2020-10-23 22:02:35,595:INFO:Creating input pipelines...:
+2020-10-23 22:02:35,643:INFO:Completed (Training Dataset)!:
+2020-10-23 22:02:35,643:INFO:Completed (Validation Dataset)!:
+2020-10-23 22:02:35,643:INFO:Building network model...:
+2020-10-23 22:02:35,933:INFO:Building completed!:
+2020-10-23 22:02:35,933:INFO:Initiate training procedure!:
+2020-10-23 22:02:35,939:INFO:Epoch 1/30:
+2020-10-23 22:02:35,941:INFO:Training Session Running...:
+2020-10-24 15:18:06,338:INFO:Creating input pipelines...:
+2020-10-24 15:18:06,340:INFO:Completed (Training Dataset)!:
+2020-10-24 15:18:06,340:INFO:Completed (Validation Dataset)!:
+2020-10-24 15:18:06,340:INFO:Building network model...:
+2020-10-24 15:18:06,468:INFO:Building completed!:
+2020-10-24 15:18:06,468:INFO:Initiate training procedure!:
+2020-10-24 15:18:06,470:INFO:Epoch 1/50:
+2020-10-24 15:18:06,471:INFO:Training Session Running...:
+2020-10-24 17:53:08,394:INFO:Creating input pipelines...:
+2020-10-24 17:53:08,401:INFO:Completed (Training Dataset)!:
+2020-10-24 17:53:08,402:INFO:Completed (Validation Dataset)!:
+2020-10-24 17:53:08,402:INFO:Building network model...:
+2020-10-24 17:53:08,700:INFO:Building completed!:
+2020-10-24 17:53:08,701:INFO:Initiate training procedure!:
+2020-10-24 17:53:08,708:INFO:Epoch 1/50:
+2020-10-24 17:53:08,715:INFO:Training Session Running...:
+2020-10-24 18:01:24,447:INFO:Creating input pipelines...:
+2020-10-24 18:01:24,449:INFO:Completed (Training Dataset)!:
+2020-10-24 18:01:24,449:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:01:24,449:INFO:Building network model...:
+2020-10-24 18:01:24,589:INFO:Building completed!:
+2020-10-24 18:01:24,589:INFO:Initiate training procedure!:
+2020-10-24 18:01:24,591:INFO:Epoch 1/50:
+2020-10-24 18:01:24,592:INFO:Training Session Running...:
+2020-10-24 18:03:37,339:INFO:Creating input pipelines...:
+2020-10-24 18:03:37,342:INFO:Completed (Training Dataset)!:
+2020-10-24 18:03:37,342:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:03:37,342:INFO:Building network model...:
+2020-10-24 18:03:37,517:INFO:Building completed!:
+2020-10-24 18:03:37,517:INFO:Initiate training procedure!:
+2020-10-24 18:03:37,522:INFO:Epoch 1/50:
+2020-10-24 18:03:37,526:INFO:Training Session Running...:
+2020-10-24 18:04:46,133:INFO:Creating input pipelines...:
+2020-10-24 18:04:46,136:INFO:Completed (Training Dataset)!:
+2020-10-24 18:04:46,136:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:04:46,136:INFO:Building network model...:
+2020-10-24 18:04:46,323:INFO:Building completed!:
+2020-10-24 18:04:46,324:INFO:Initiate training procedure!:
+2020-10-24 18:04:46,330:INFO:Epoch 1/50:
+2020-10-24 18:04:46,334:INFO:Training Session Running...:
+2020-10-24 18:06:18,294:INFO:Creating input pipelines...:
+2020-10-24 18:06:18,296:INFO:Completed (Training Dataset)!:
+2020-10-24 18:06:18,296:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:06:18,297:INFO:Building network model...:
+2020-10-24 18:06:18,465:INFO:Building completed!:
+2020-10-24 18:06:18,465:INFO:Initiate training procedure!:
+2020-10-24 18:06:18,470:INFO:Epoch 1/50:
+2020-10-24 18:06:18,473:INFO:Training Session Running...:
+2020-10-24 18:08:32,115:INFO:Creating input pipelines...:
+2020-10-24 18:08:32,118:INFO:Completed (Training Dataset)!:
+2020-10-24 18:08:32,118:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:08:32,118:INFO:Building network model...:
+2020-10-24 18:08:32,294:INFO:Building completed!:
+2020-10-24 18:08:32,294:INFO:Initiate training procedure!:
+2020-10-24 18:08:32,299:INFO:Epoch 1/50:
+2020-10-24 18:08:32,302:INFO:Training Session Running...:
+2020-10-24 18:09:06,547:INFO:Creating input pipelines...:
+2020-10-24 18:09:06,550:INFO:Completed (Training Dataset)!:
+2020-10-24 18:09:06,550:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:09:06,550:INFO:Building network model...:
+2020-10-24 18:09:06,731:INFO:Building completed!:
+2020-10-24 18:09:06,732:INFO:Initiate training procedure!:
+2020-10-24 18:09:06,737:INFO:Epoch 1/50:
+2020-10-24 18:09:06,741:INFO:Training Session Running...:
+2020-10-24 18:09:56,783:INFO:Creating input pipelines...:
+2020-10-24 18:09:56,786:INFO:Completed (Training Dataset)!:
+2020-10-24 18:09:56,786:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:09:56,786:INFO:Building network model...:
+2020-10-24 18:09:56,958:INFO:Building completed!:
+2020-10-24 18:09:56,958:INFO:Initiate training procedure!:
+2020-10-24 18:09:56,963:INFO:Epoch 1/50:
+2020-10-24 18:09:56,966:INFO:Training Session Running...:
+2020-10-24 18:10:12,182:INFO:Creating input pipelines...:
+2020-10-24 18:10:12,184:INFO:Completed (Training Dataset)!:
+2020-10-24 18:10:12,184:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:10:12,185:INFO:Building network model...:
+2020-10-24 18:10:12,354:INFO:Building completed!:
+2020-10-24 18:10:12,354:INFO:Initiate training procedure!:
+2020-10-24 18:10:12,359:INFO:Epoch 1/50:
+2020-10-24 18:10:12,362:INFO:Training Session Running...:
+2020-10-24 18:10:59,072:INFO:Creating input pipelines...:
+2020-10-24 18:10:59,075:INFO:Completed (Training Dataset)!:
+2020-10-24 18:10:59,075:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:10:59,075:INFO:Building network model...:
+2020-10-24 18:10:59,321:INFO:Building completed!:
+2020-10-24 18:10:59,321:INFO:Initiate training procedure!:
+2020-10-24 18:10:59,327:INFO:Epoch 1/50:
+2020-10-24 18:10:59,331:INFO:Training Session Running...:
+2020-10-24 18:23:31,212:INFO:Creating input pipelines...:
+2020-10-24 18:23:31,215:INFO:Completed (Training Dataset)!:
+2020-10-24 18:23:31,215:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:23:31,215:INFO:Building network model...:
+2020-10-24 18:23:31,404:INFO:Building completed!:
+2020-10-24 18:23:31,404:INFO:Initiate training procedure!:
+2020-10-24 18:23:31,409:INFO:Epoch 1/50:
+2020-10-24 18:23:31,413:INFO:Training Session Running...:
+2020-10-24 18:23:50,234:INFO:Creating input pipelines...:
+2020-10-24 18:23:50,237:INFO:Completed (Training Dataset)!:
+2020-10-24 18:23:50,237:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:23:50,237:INFO:Building network model...:
+2020-10-24 18:23:50,429:INFO:Building completed!:
+2020-10-24 18:23:50,429:INFO:Initiate training procedure!:
+2020-10-24 18:23:50,435:INFO:Epoch 1/50:
+2020-10-24 18:23:50,439:INFO:Training Session Running...:
+2020-10-24 18:24:02,718:INFO:Creating input pipelines...:
+2020-10-24 18:24:02,720:INFO:Completed (Training Dataset)!:
+2020-10-24 18:24:02,721:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:24:02,721:INFO:Building network model...:
+2020-10-24 18:24:02,893:INFO:Building completed!:
+2020-10-24 18:24:02,894:INFO:Initiate training procedure!:
+2020-10-24 18:24:02,895:INFO:Epoch 1/50:
+2020-10-24 18:24:02,897:INFO:Training Session Running...:
+2020-10-24 18:26:06,808:INFO:Creating input pipelines...:
+2020-10-24 18:26:06,816:INFO:Completed (Training Dataset)!:
+2020-10-24 18:26:06,816:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:26:06,816:INFO:Building network model...:
+2020-10-24 18:26:07,107:INFO:Building completed!:
+2020-10-24 18:26:07,108:INFO:Initiate training procedure!:
+2020-10-24 18:26:07,114:INFO:Epoch 1/50:
+2020-10-24 18:26:07,120:INFO:Training Session Running...:
+2020-10-24 18:27:27,380:INFO:Creating input pipelines...:
+2020-10-24 18:27:27,384:INFO:Completed (Training Dataset)!:
+2020-10-24 18:27:27,384:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:27:27,384:INFO:Building network model...:
+2020-10-24 18:27:27,634:INFO:Building completed!:
+2020-10-24 18:27:27,635:INFO:Initiate training procedure!:
+2020-10-24 18:27:27,644:INFO:Epoch 1/50:
+2020-10-24 18:27:27,648:INFO:Training Session Running...:
+2020-10-24 18:29:07,801:INFO:Creating input pipelines...:
+2020-10-24 18:29:07,803:INFO:Completed (Training Dataset)!:
+2020-10-24 18:29:07,804:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:29:07,804:INFO:Building network model...:
+2020-10-24 18:29:08,043:INFO:Building completed!:
+2020-10-24 18:29:08,043:INFO:Initiate training procedure!:
+2020-10-24 18:29:08,049:INFO:Epoch 1/50:
+2020-10-24 18:29:08,052:INFO:Training Session Running...:
+2020-10-24 18:30:05,845:INFO:Creating input pipelines...:
+2020-10-24 18:30:05,847:INFO:Completed (Training Dataset)!:
+2020-10-24 18:30:05,848:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:30:05,848:INFO:Building network model...:
+2020-10-24 18:30:06,085:INFO:Building completed!:
+2020-10-24 18:30:06,086:INFO:Initiate training procedure!:
+2020-10-24 18:30:06,091:INFO:Epoch 1/50:
+2020-10-24 18:30:06,095:INFO:Training Session Running...:
+2020-10-24 18:31:51,064:INFO:Creating input pipelines...:
+2020-10-24 18:31:51,069:INFO:Completed (Training Dataset)!:
+2020-10-24 18:31:51,070:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:31:51,070:INFO:Building network model...:
+2020-10-24 18:31:51,309:INFO:Building completed!:
+2020-10-24 18:31:51,309:INFO:Initiate training procedure!:
+2020-10-24 18:31:51,314:INFO:Epoch 1/50:
+2020-10-24 18:31:51,318:INFO:Training Session Running...:
+2020-10-24 18:50:22,095:INFO:Creating input pipelines...:
+2020-10-24 18:50:22,098:INFO:Completed (Training Dataset)!:
+2020-10-24 18:50:22,098:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:50:22,098:INFO:Building network model...:
+2020-10-24 18:50:22,273:INFO:Building completed!:
+2020-10-24 18:50:22,273:INFO:Initiate training procedure!:
+2020-10-24 18:50:22,278:INFO:Epoch 1/50:
+2020-10-24 18:50:22,282:INFO:Training Session Running...:
+2020-10-24 18:50:51,189:INFO:Creating input pipelines...:
+2020-10-24 18:50:51,192:INFO:Completed (Training Dataset)!:
+2020-10-24 18:50:51,193:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:50:51,193:INFO:Building network model...:
+2020-10-24 18:50:51,372:INFO:Building completed!:
+2020-10-24 18:50:51,372:INFO:Initiate training procedure!:
+2020-10-24 18:50:51,377:INFO:Epoch 1/50:
+2020-10-24 18:50:51,381:INFO:Training Session Running...:
+2020-10-24 18:52:03,450:INFO:Creating input pipelines...:
+2020-10-24 18:52:03,453:INFO:Completed (Training Dataset)!:
+2020-10-24 18:52:03,453:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:52:03,453:INFO:Building network model...:
+2020-10-24 18:52:03,628:INFO:Building completed!:
+2020-10-24 18:52:03,628:INFO:Initiate training procedure!:
+2020-10-24 18:52:03,633:INFO:Epoch 1/50:
+2020-10-24 18:52:03,636:INFO:Training Session Running...:
+2020-10-24 18:54:28,281:INFO:Creating input pipelines...:
+2020-10-24 18:54:28,284:INFO:Completed (Training Dataset)!:
+2020-10-24 18:54:28,284:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:54:28,284:INFO:Building network model...:
+2020-10-24 18:54:28,462:INFO:Building completed!:
+2020-10-24 18:54:28,463:INFO:Initiate training procedure!:
+2020-10-24 18:54:28,468:INFO:Epoch 1/50:
+2020-10-24 18:54:28,472:INFO:Training Session Running...:
+2020-10-24 18:59:37,976:INFO:Creating input pipelines...:
+2020-10-24 18:59:37,978:INFO:Completed (Training Dataset)!:
+2020-10-24 18:59:37,978:INFO:Completed (Validation Dataset)!:
+2020-10-24 18:59:37,978:INFO:Building network model...:
+2020-10-24 18:59:38,151:INFO:Building completed!:
+2020-10-24 18:59:38,151:INFO:Initiate training procedure!:
+2020-10-24 18:59:38,156:INFO:Epoch 1/50:
+2020-10-24 18:59:38,160:INFO:Training Session Running...:
+2020-10-24 19:00:08,158:INFO:Creating input pipelines...:
+2020-10-24 19:00:08,161:INFO:Completed (Training Dataset)!:
+2020-10-24 19:00:08,161:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:00:08,161:INFO:Building network model...:
+2020-10-24 19:00:08,374:INFO:Building completed!:
+2020-10-24 19:00:08,375:INFO:Initiate training procedure!:
+2020-10-24 19:00:08,385:INFO:Epoch 1/50:
+2020-10-24 19:00:08,390:INFO:Training Session Running...:
+2020-10-24 19:00:46,620:INFO:Creating input pipelines...:
+2020-10-24 19:00:46,623:INFO:Completed (Training Dataset)!:
+2020-10-24 19:00:46,623:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:00:46,623:INFO:Building network model...:
+2020-10-24 19:00:46,796:INFO:Building completed!:
+2020-10-24 19:00:46,796:INFO:Initiate training procedure!:
+2020-10-24 19:00:46,801:INFO:Epoch 1/50:
+2020-10-24 19:00:46,805:INFO:Training Session Running...:
+2020-10-24 19:01:39,943:INFO:Creating input pipelines...:
+2020-10-24 19:01:39,946:INFO:Completed (Training Dataset)!:
+2020-10-24 19:01:39,946:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:01:39,946:INFO:Building network model...:
+2020-10-24 19:01:40,120:INFO:Building completed!:
+2020-10-24 19:01:40,120:INFO:Initiate training procedure!:
+2020-10-24 19:01:40,125:INFO:Epoch 1/50:
+2020-10-24 19:01:40,129:INFO:Training Session Running...:
+2020-10-24 19:01:55,626:INFO:Creating input pipelines...:
+2020-10-24 19:01:55,629:INFO:Completed (Training Dataset)!:
+2020-10-24 19:01:55,629:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:01:55,629:INFO:Building network model...:
+2020-10-24 19:01:55,811:INFO:Building completed!:
+2020-10-24 19:01:55,811:INFO:Initiate training procedure!:
+2020-10-24 19:01:55,816:INFO:Epoch 1/50:
+2020-10-24 19:01:55,819:INFO:Training Session Running...:
+2020-10-24 19:02:16,372:INFO:Creating input pipelines...:
+2020-10-24 19:02:16,374:INFO:Completed (Training Dataset)!:
+2020-10-24 19:02:16,374:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:02:16,375:INFO:Building network model...:
+2020-10-24 19:02:16,549:INFO:Building completed!:
+2020-10-24 19:02:16,550:INFO:Initiate training procedure!:
+2020-10-24 19:02:16,555:INFO:Epoch 1/50:
+2020-10-24 19:02:16,559:INFO:Training Session Running...:
+2020-10-24 19:05:29,366:INFO:Creating input pipelines...:
+2020-10-24 19:05:29,368:INFO:Completed (Training Dataset)!:
+2020-10-24 19:05:29,369:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:05:29,369:INFO:Building network model...:
+2020-10-24 19:05:29,557:INFO:Building completed!:
+2020-10-24 19:05:29,557:INFO:Initiate training procedure!:
+2020-10-24 19:05:29,562:INFO:Epoch 1/50:
+2020-10-24 19:05:29,566:INFO:Training Session Running...:
+2020-10-24 19:05:55,430:INFO:Creating input pipelines...:
+2020-10-24 19:05:55,432:INFO:Completed (Training Dataset)!:
+2020-10-24 19:05:55,432:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:05:55,433:INFO:Building network model...:
+2020-10-24 19:05:55,607:INFO:Building completed!:
+2020-10-24 19:05:55,607:INFO:Initiate training procedure!:
+2020-10-24 19:05:55,612:INFO:Epoch 1/50:
+2020-10-24 19:05:55,616:INFO:Training Session Running...:
+2020-10-24 19:06:28,037:INFO:Creating input pipelines...:
+2020-10-24 19:06:28,040:INFO:Completed (Training Dataset)!:
+2020-10-24 19:06:28,040:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:06:28,040:INFO:Building network model...:
+2020-10-24 19:06:28,224:INFO:Building completed!:
+2020-10-24 19:06:28,224:INFO:Initiate training procedure!:
+2020-10-24 19:06:28,229:INFO:Epoch 1/50:
+2020-10-24 19:06:28,233:INFO:Training Session Running...:
+2020-10-24 19:06:52,822:INFO:Creating input pipelines...:
+2020-10-24 19:06:52,824:INFO:Completed (Training Dataset)!:
+2020-10-24 19:06:52,824:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:06:52,825:INFO:Building network model...:
+2020-10-24 19:06:53,001:INFO:Building completed!:
+2020-10-24 19:06:53,001:INFO:Initiate training procedure!:
+2020-10-24 19:06:53,006:INFO:Epoch 1/50:
+2020-10-24 19:06:53,010:INFO:Training Session Running...:
+2020-10-24 19:07:38,698:INFO:Creating input pipelines...:
+2020-10-24 19:07:38,700:INFO:Completed (Training Dataset)!:
+2020-10-24 19:07:38,700:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:07:38,700:INFO:Building network model...:
+2020-10-24 19:07:38,875:INFO:Building completed!:
+2020-10-24 19:07:38,875:INFO:Initiate training procedure!:
+2020-10-24 19:07:38,880:INFO:Epoch 1/50:
+2020-10-24 19:07:38,884:INFO:Training Session Running...:
+2020-10-24 19:07:57,784:INFO:Creating input pipelines...:
+2020-10-24 19:07:57,787:INFO:Completed (Training Dataset)!:
+2020-10-24 19:07:57,787:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:07:57,787:INFO:Building network model...:
+2020-10-24 19:07:57,970:INFO:Building completed!:
+2020-10-24 19:07:57,970:INFO:Initiate training procedure!:
+2020-10-24 19:07:57,975:INFO:Epoch 1/50:
+2020-10-24 19:07:57,979:INFO:Training Session Running...:
+2020-10-24 19:21:11,098:INFO:Creating input pipelines...:
+2020-10-24 19:21:11,101:INFO:Completed (Training Dataset)!:
+2020-10-24 19:21:11,101:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:21:11,101:INFO:Building network model...:
+2020-10-24 19:21:11,279:INFO:Building completed!:
+2020-10-24 19:21:11,279:INFO:Initiate training procedure!:
+2020-10-24 19:21:11,285:INFO:Epoch 1/50:
+2020-10-24 19:21:11,288:INFO:Training Session Running...:
+2020-10-24 19:21:26,920:INFO:Creating input pipelines...:
+2020-10-24 19:21:26,923:INFO:Completed (Training Dataset)!:
+2020-10-24 19:21:26,923:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:21:26,923:INFO:Building network model...:
+2020-10-24 19:21:27,110:INFO:Building completed!:
+2020-10-24 19:21:27,110:INFO:Initiate training procedure!:
+2020-10-24 19:21:27,115:INFO:Epoch 1/50:
+2020-10-24 19:21:27,119:INFO:Training Session Running...:
+2020-10-24 19:21:55,242:INFO:Creating input pipelines...:
+2020-10-24 19:21:55,245:INFO:Completed (Training Dataset)!:
+2020-10-24 19:21:55,245:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:21:55,245:INFO:Building network model...:
+2020-10-24 19:21:55,426:INFO:Building completed!:
+2020-10-24 19:21:55,426:INFO:Initiate training procedure!:
+2020-10-24 19:21:55,431:INFO:Epoch 1/50:
+2020-10-24 19:21:55,435:INFO:Training Session Running...:
+2020-10-24 19:35:10,935:INFO:Creating input pipelines...:
+2020-10-24 19:35:10,938:INFO:Completed (Training Dataset)!:
+2020-10-24 19:35:10,938:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:35:10,938:INFO:Building network model...:
+2020-10-24 19:35:11,113:INFO:Building completed!:
+2020-10-24 19:35:11,113:INFO:Initiate training procedure!:
+2020-10-24 19:35:11,118:INFO:Epoch 1/50:
+2020-10-24 19:35:11,122:INFO:Training Session Running...:
+2020-10-24 19:35:19,792:INFO:Creating input pipelines...:
+2020-10-24 19:35:19,795:INFO:Completed (Training Dataset)!:
+2020-10-24 19:35:19,795:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:35:19,795:INFO:Building network model...:
+2020-10-24 19:35:19,965:INFO:Building completed!:
+2020-10-24 19:35:19,966:INFO:Initiate training procedure!:
+2020-10-24 19:35:19,970:INFO:Epoch 1/50:
+2020-10-24 19:35:19,974:INFO:Training Session Running...:
+2020-10-24 19:35:40,266:INFO:Creating input pipelines...:
+2020-10-24 19:35:40,269:INFO:Completed (Training Dataset)!:
+2020-10-24 19:35:40,269:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:35:40,269:INFO:Building network model...:
+2020-10-24 19:35:40,446:INFO:Building completed!:
+2020-10-24 19:35:40,447:INFO:Initiate training procedure!:
+2020-10-24 19:35:40,452:INFO:Epoch 1/50:
+2020-10-24 19:35:40,455:INFO:Training Session Running...:
+2020-10-24 19:35:51,599:INFO:Creating input pipelines...:
+2020-10-24 19:35:51,601:INFO:Completed (Training Dataset)!:
+2020-10-24 19:35:51,601:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:35:51,601:INFO:Building network model...:
+2020-10-24 19:35:51,786:INFO:Building completed!:
+2020-10-24 19:35:51,787:INFO:Initiate training procedure!:
+2020-10-24 19:35:51,792:INFO:Epoch 1/50:
+2020-10-24 19:35:51,796:INFO:Training Session Running...:
+2020-10-24 19:36:31,237:INFO:Creating input pipelines...:
+2020-10-24 19:36:31,239:INFO:Completed (Training Dataset)!:
+2020-10-24 19:36:31,239:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:36:31,239:INFO:Building network model...:
+2020-10-24 19:36:31,419:INFO:Building completed!:
+2020-10-24 19:36:31,419:INFO:Initiate training procedure!:
+2020-10-24 19:36:31,424:INFO:Epoch 1/50:
+2020-10-24 19:36:31,427:INFO:Training Session Running...:
+2020-10-24 19:36:57,159:INFO:Creating input pipelines...:
+2020-10-24 19:36:57,161:INFO:Completed (Training Dataset)!:
+2020-10-24 19:36:57,162:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:36:57,162:INFO:Building network model...:
+2020-10-24 19:36:57,342:INFO:Building completed!:
+2020-10-24 19:36:57,342:INFO:Initiate training procedure!:
+2020-10-24 19:36:57,347:INFO:Epoch 1/50:
+2020-10-24 19:36:57,350:INFO:Training Session Running...:
+2020-10-24 19:37:37,401:INFO:Creating input pipelines...:
+2020-10-24 19:37:37,404:INFO:Completed (Training Dataset)!:
+2020-10-24 19:37:37,404:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:37:37,404:INFO:Building network model...:
+2020-10-24 19:37:37,585:INFO:Building completed!:
+2020-10-24 19:37:37,586:INFO:Initiate training procedure!:
+2020-10-24 19:37:37,591:INFO:Epoch 1/50:
+2020-10-24 19:37:37,594:INFO:Training Session Running...:
+2020-10-24 19:38:07,574:INFO:Creating input pipelines...:
+2020-10-24 19:38:07,577:INFO:Completed (Training Dataset)!:
+2020-10-24 19:38:07,577:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:38:07,577:INFO:Building network model...:
+2020-10-24 19:38:07,754:INFO:Building completed!:
+2020-10-24 19:38:07,755:INFO:Initiate training procedure!:
+2020-10-24 19:38:07,759:INFO:Epoch 1/50:
+2020-10-24 19:38:07,763:INFO:Training Session Running...:
+2020-10-24 19:38:27,044:INFO:Creating input pipelines...:
+2020-10-24 19:38:27,047:INFO:Completed (Training Dataset)!:
+2020-10-24 19:38:27,047:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:38:27,047:INFO:Building network model...:
+2020-10-24 19:38:27,225:INFO:Building completed!:
+2020-10-24 19:38:27,225:INFO:Initiate training procedure!:
+2020-10-24 19:38:27,230:INFO:Epoch 1/50:
+2020-10-24 19:38:27,234:INFO:Training Session Running...:
+2020-10-24 19:39:38,757:INFO:Creating input pipelines...:
+2020-10-24 19:39:38,760:INFO:Completed (Training Dataset)!:
+2020-10-24 19:39:38,760:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:39:38,760:INFO:Building network model...:
+2020-10-24 19:39:38,938:INFO:Building completed!:
+2020-10-24 19:39:38,939:INFO:Initiate training procedure!:
+2020-10-24 19:39:38,944:INFO:Epoch 1/50:
+2020-10-24 19:39:38,948:INFO:Training Session Running...:
+2020-10-24 19:39:48,657:INFO:Creating input pipelines...:
+2020-10-24 19:39:48,659:INFO:Completed (Training Dataset)!:
+2020-10-24 19:39:48,659:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:39:48,660:INFO:Building network model...:
+2020-10-24 19:39:48,834:INFO:Building completed!:
+2020-10-24 19:39:48,835:INFO:Initiate training procedure!:
+2020-10-24 19:39:48,840:INFO:Epoch 1/50:
+2020-10-24 19:39:48,843:INFO:Training Session Running...:
+2020-10-24 19:40:06,439:INFO:Creating input pipelines...:
+2020-10-24 19:40:06,442:INFO:Completed (Training Dataset)!:
+2020-10-24 19:40:06,442:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:40:06,442:INFO:Building network model...:
+2020-10-24 19:40:06,619:INFO:Building completed!:
+2020-10-24 19:40:06,619:INFO:Initiate training procedure!:
+2020-10-24 19:40:06,624:INFO:Epoch 1/50:
+2020-10-24 19:40:06,627:INFO:Training Session Running...:
+2020-10-24 19:40:21,328:INFO:Creating input pipelines...:
+2020-10-24 19:40:21,331:INFO:Completed (Training Dataset)!:
+2020-10-24 19:40:21,331:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:40:21,331:INFO:Building network model...:
+2020-10-24 19:40:21,520:INFO:Building completed!:
+2020-10-24 19:40:21,520:INFO:Initiate training procedure!:
+2020-10-24 19:40:21,525:INFO:Epoch 1/50:
+2020-10-24 19:40:21,529:INFO:Training Session Running...:
+2020-10-24 19:40:43,231:INFO:Creating input pipelines...:
+2020-10-24 19:40:43,234:INFO:Completed (Training Dataset)!:
+2020-10-24 19:40:43,234:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:40:43,235:INFO:Building network model...:
+2020-10-24 19:40:43,412:INFO:Building completed!:
+2020-10-24 19:40:43,412:INFO:Initiate training procedure!:
+2020-10-24 19:40:43,417:INFO:Epoch 1/50:
+2020-10-24 19:40:43,421:INFO:Training Session Running...:
+2020-10-24 19:43:40,632:INFO:Creating input pipelines...:
+2020-10-24 19:43:40,634:INFO:Completed (Training Dataset)!:
+2020-10-24 19:43:40,634:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:43:40,635:INFO:Building network model...:
+2020-10-24 19:43:40,829:INFO:Building completed!:
+2020-10-24 19:43:40,830:INFO:Initiate training procedure!:
+2020-10-24 19:43:40,835:INFO:Epoch 1/50:
+2020-10-24 19:43:40,839:INFO:Training Session Running...:
+2020-10-24 19:43:50,659:INFO:Creating input pipelines...:
+2020-10-24 19:43:50,661:INFO:Completed (Training Dataset)!:
+2020-10-24 19:43:50,662:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:43:50,662:INFO:Building network model...:
+2020-10-24 19:43:50,841:INFO:Building completed!:
+2020-10-24 19:43:50,841:INFO:Initiate training procedure!:
+2020-10-24 19:43:50,847:INFO:Epoch 1/50:
+2020-10-24 19:43:50,850:INFO:Training Session Running...:
+2020-10-24 19:44:03,722:INFO:Creating input pipelines...:
+2020-10-24 19:44:03,726:INFO:Completed (Training Dataset)!:
+2020-10-24 19:44:03,726:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:44:03,727:INFO:Building network model...:
+2020-10-24 19:44:03,910:INFO:Building completed!:
+2020-10-24 19:44:03,910:INFO:Initiate training procedure!:
+2020-10-24 19:44:03,915:INFO:Epoch 1/50:
+2020-10-24 19:44:03,918:INFO:Training Session Running...:
+2020-10-24 19:47:35,654:INFO:Creating input pipelines...:
+2020-10-24 19:47:35,656:INFO:Completed (Training Dataset)!:
+2020-10-24 19:47:35,656:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:47:35,656:INFO:Building network model...:
+2020-10-24 19:47:35,836:INFO:Building completed!:
+2020-10-24 19:47:35,836:INFO:Initiate training procedure!:
+2020-10-24 19:47:35,841:INFO:Epoch 1/50:
+2020-10-24 19:47:35,845:INFO:Training Session Running...:
+2020-10-24 19:48:09,793:INFO:Creating input pipelines...:
+2020-10-24 19:48:09,796:INFO:Completed (Training Dataset)!:
+2020-10-24 19:48:09,796:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:48:09,796:INFO:Building network model...:
+2020-10-24 19:48:09,975:INFO:Building completed!:
+2020-10-24 19:48:09,976:INFO:Initiate training procedure!:
+2020-10-24 19:48:09,980:INFO:Epoch 1/50:
+2020-10-24 19:48:09,984:INFO:Training Session Running...:
+2020-10-24 19:48:24,498:INFO:Creating input pipelines...:
+2020-10-24 19:48:24,501:INFO:Completed (Training Dataset)!:
+2020-10-24 19:48:24,501:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:48:24,501:INFO:Building network model...:
+2020-10-24 19:48:24,674:INFO:Building completed!:
+2020-10-24 19:48:24,675:INFO:Initiate training procedure!:
+2020-10-24 19:48:24,680:INFO:Epoch 1/50:
+2020-10-24 19:48:24,684:INFO:Training Session Running...:
+2020-10-24 19:49:36,108:INFO:Creating input pipelines...:
+2020-10-24 19:49:36,111:INFO:Completed (Training Dataset)!:
+2020-10-24 19:49:36,111:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:49:36,111:INFO:Building network model...:
+2020-10-24 19:49:36,292:INFO:Building completed!:
+2020-10-24 19:49:36,292:INFO:Initiate training procedure!:
+2020-10-24 19:49:36,297:INFO:Epoch 1/50:
+2020-10-24 19:49:36,301:INFO:Training Session Running...:
+2020-10-24 19:49:58,967:INFO:Creating input pipelines...:
+2020-10-24 19:49:58,969:INFO:Completed (Training Dataset)!:
+2020-10-24 19:49:58,970:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:49:58,970:INFO:Building network model...:
+2020-10-24 19:49:59,144:INFO:Building completed!:
+2020-10-24 19:49:59,144:INFO:Initiate training procedure!:
+2020-10-24 19:49:59,149:INFO:Epoch 1/50:
+2020-10-24 19:49:59,153:INFO:Training Session Running...:
+2020-10-24 19:50:06,981:INFO:Creating input pipelines...:
+2020-10-24 19:50:06,984:INFO:Completed (Training Dataset)!:
+2020-10-24 19:50:06,985:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:50:06,985:INFO:Building network model...:
+2020-10-24 19:50:07,158:INFO:Building completed!:
+2020-10-24 19:50:07,159:INFO:Initiate training procedure!:
+2020-10-24 19:50:07,164:INFO:Epoch 1/50:
+2020-10-24 19:50:07,167:INFO:Training Session Running...:
+2020-10-24 19:50:14,378:INFO:Creating input pipelines...:
+2020-10-24 19:50:14,381:INFO:Completed (Training Dataset)!:
+2020-10-24 19:50:14,381:INFO:Completed (Validation Dataset)!:
+2020-10-24 19:50:14,381:INFO:Building network model...:
+2020-10-24 19:50:14,552:INFO:Building completed!:
+2020-10-24 19:50:14,553:INFO:Initiate training procedure!:
+2020-10-24 19:50:14,558:INFO:Epoch 1/50:
+2020-10-24 19:50:14,561:INFO:Training Session Running...:

@@ -16,34 +16,35 @@ class CResBlock(nn.Module):
 
   def __init__(self, num_channels_input, features_G, dropout_ratio=0.5, leaky_slope=0.2, use_crelu=False, use_avgpool=False):
     super(CResBlock, self).__init__()
+    dilation_size = 2
     # 224 x 224 x 6 -> 112 x 112 x 16
-    self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=features_G, kernel_size=3, padding=1, stride=2)
+    self.conv_down_1 = nn.Conv2d(in_channels=num_channels_input, out_channels=features_G, kernel_size=3, padding=1, stride=2, dilation=1, padding_mode='reflect')
     self.bn_down_1 = nn.BatchNorm2d(features_G)
 
     if use_crelu:
       features_G *= 2
 
-    self.conv_down_2 = nn.Conv2d(in_channels=features_G, out_channels=features_G * 2, kernel_size=3, padding=1, stride=2)
+    self.conv_down_2 = nn.Conv2d(in_channels=features_G, out_channels=features_G * 2, kernel_size=3, padding=3, stride=2, dilation=3, padding_mode='reflect')
     self.bn_down_2 = nn.BatchNorm2d(features_G * 2)
 
     if use_crelu:
       features_G *= 2
 
-    self.conv_down_3 = nn.Conv2d(in_channels=features_G * 2, out_channels=features_G * 4, kernel_size=3, padding=1, stride=2)
+    self.conv_down_3 = nn.Conv2d(in_channels=features_G * 2, out_channels=features_G * 4, kernel_size=3, padding=5, stride=2, dilation=5, padding_mode='reflect')
     self.bn_down_3 = nn.BatchNorm2d(features_G * 4)
 
     if use_crelu:
       features_G *= 2
 
-    self.bottleneck_1 = nn.Conv2d(in_channels=features_G * 4, out_channels=features_G, kernel_size=1)
+    self.bottleneck_1 = nn.Conv2d(in_channels=features_G * 4, out_channels=features_G, kernel_size=1, padding_mode='reflect')
 
     self.conv_up_3 = nn.ConvTranspose2d(in_channels=(features_G * 4 + features_G), out_channels=features_G * 4, kernel_size=2, stride=2)
     self.bn_up_3 = nn.BatchNorm2d(features_G * 4)
 
     if use_crelu:
-      self.bottleneck_2 = nn.Conv2d(in_channels=(features_G * 4 + features_G), out_channels=features_G * 4, kernel_size=1)
+      self.bottleneck_2 = nn.Conv2d(in_channels=(features_G * 4 + features_G), out_channels=features_G * 4, kernel_size=1, padding_mode='reflect')
     else:
-      self.bottleneck_2 = nn.Conv2d(in_channels=features_G * 6, out_channels=features_G * 4, kernel_size=1)
+      self.bottleneck_2 = nn.Conv2d(in_channels=features_G * 6, out_channels=features_G * 4, kernel_size=1, padding_mode='reflect')
 
     self.conv_up_2 = nn.ConvTranspose2d(in_channels=features_G * 4, out_channels=features_G * 2, kernel_size=2, stride=2)
     self.bn_up_2 = nn.BatchNorm2d(features_G * 2)
@@ -54,7 +55,7 @@ class CResBlock(nn.Module):
       self.conv_up_1 = nn.ConvTranspose2d(in_channels=features_G * 3, out_channels=features_G, kernel_size=2, stride=2)
     self.bn_up_1 = nn.BatchNorm2d(features_G)
 
-    self.bottleneck_3 = nn.Conv2d(in_channels=features_G, out_channels=num_channels_input, kernel_size=1)
+    self.bottleneck_3 = nn.Conv2d(in_channels=features_G, out_channels=num_channels_input, kernel_size=1, padding_mode='reflect')
 
     self.out = nn.ConvTranspose2d(in_channels=features_G * 2, out_channels=features_G, kernel_size=2, stride=2)
 
@@ -72,13 +73,13 @@ class CResBlock(nn.Module):
 
     # Residual layers
     if use_crelu:
-      self.res_bottleneck_1 = nn.Conv2d(in_channels=(features_G * 2 + features_G // 2), out_channels=features_G // 4, kernel_size=1)
-      self.res_bottleneck_2 = nn.Conv2d(in_channels=features_G * 6, out_channels=features_G, kernel_size=1)
+      self.res_bottleneck_1 = nn.Conv2d(in_channels=(features_G * 2 + features_G // 2), out_channels=features_G // 4, kernel_size=1, padding_mode='reflect')
+      self.res_bottleneck_2 = nn.Conv2d(in_channels=features_G * 6, out_channels=features_G, kernel_size=1, padding_mode='reflect')
     else:
-      self.res_bottleneck_1 = nn.Conv2d(in_channels=features_G * 4, out_channels=features_G, kernel_size=1)
-      self.res_bottleneck_2 = nn.Conv2d(in_channels=features_G * 8, out_channels=features_G * 2, kernel_size=1)
+      self.res_bottleneck_1 = nn.Conv2d(in_channels=features_G * 4, out_channels=features_G, kernel_size=1, padding_mode='reflect')
+      self.res_bottleneck_2 = nn.Conv2d(in_channels=features_G * 8, out_channels=features_G * 2, kernel_size=1, padding_mode='reflect')
 
-    self.res_bottleneck_3 = nn.Conv2d(in_channels=features_G * 9, out_channels=features_G * 4, kernel_size=1)
+    self.res_bottleneck_3 = nn.Conv2d(in_channels=features_G * 9, out_channels=features_G * 4, kernel_size=1, padding_mode='reflect')
 
     self.dropout = nn.Dropout2d(p=dropout_ratio)
 
@@ -163,8 +164,6 @@ class CResUNet(nn.Module):
     self.out_final = nn.Conv2d(in_channels=self.num_dense_blocks * self.num_channels_input,
                                out_channels=self.num_channels_output, kernel_size=1, stride=1)
 
-    self.tanh = nn.Tanh()
-
   def forward(self, image_masked, noise_tensor=None):
 
     if self.noise_tensor is not None:
@@ -205,7 +204,7 @@ class CResUNet(nn.Module):
     else:
       raise NotImplementedError
 
-    return self.tanh(out_final)
+    return out_final
 
 #
 #

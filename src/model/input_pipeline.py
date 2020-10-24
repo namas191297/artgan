@@ -99,10 +99,10 @@ class ArtNetDataset(torch.utils.data.Dataset):
     range_y_start = rand_y
     range_y_end = rand_y + mask_width
 
-    import matplotlib.pyplot as plt
-    plt.figure(figsize=(10, 10))
-    plt.imshow(mask, cmap='gray')
-    plt.show()
+#     import matplotlib.pyplot as plt
+#     plt.figure(figsize=(10, 10))
+#     plt.imshow(mask, cmap='gray')
+#     plt.show()
 
     # plt.figure(figsize=(10, 10))
     # plt.imshow(alpha, cmap='gray')
@@ -131,9 +131,9 @@ class ArtNetDataset(torch.utils.data.Dataset):
     # masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1], convert(mask, -1, 1, np.float32))
     # masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2], convert(mask, -1, 1, np.float32))
 
-    plt.figure(figsize=(10, 10))
-    plt.imshow(masked_image * 0.5 + 0.5)
-    plt.show()
+#     plt.figure(figsize=(10, 10))
+#     plt.imshow(masked_image * 0.5 + 0.5)
+#     plt.show()
 
     # print(mask)
     # random_x = self.random_coord(masked_image)

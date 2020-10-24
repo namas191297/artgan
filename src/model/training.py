@@ -9,6 +9,28 @@ from model.model_structure import RunningAverage
 from model.evaluation import evaluate_session
 from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, get_discriminator_loss_conv
 
+def get_discriminator_loss(image_real, image_masked, model_D, model_G, criterion_D, batch_size, optimizer_D, params, noise_tensor=None):
+  loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D',
+                                                          model_D,
+                                                          criterion_D,
+                                                          params.image_size, params.device)
+
+  # fake image
+  if noise_tensor is None:
+    noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
+  fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
+
+  loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D',
+                                               model_D,
+                                               criterion_D, params.image_size,
+                                               params.device)
+
+  # aggregate discriminator loss
+  loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+
+  return fake, loss_D, model_D, model_G, optimizer_D, confidence_D
+
+
 
 def train_session(model_spec, pipeline, epoch, writer, params):
   """
@@ -21,28 +43,36 @@ def train_session(model_spec, pipeline, epoch, writer, params):
   :param params: (Params) hyper-parameters
   :return: (dict) the batch mean metrics - loss and accuracy etc
   """
-  model_G = model_spec['models']['model_G']
-  model_D = model_spec['models']['model_D']
+  model_G_c = model_spec['models']['model_G_c']
+  model_G_r = model_spec['models']['model_G_r']
+  model_D_c = model_spec['models']['model_D_c']
+  model_D_r = model_spec['models']['model_D_r']
 
   criterion_D = model_spec['losses']['criterion_D']
   criterion_G = model_spec['losses']['criterion_G']
   L1_criterion_G = model_spec['losses']['L1_criterion_G']
 
-  optimizer_D = model_spec['optimizers']['optimizer_D']
-  optimizer_G = model_spec['optimizers']['optimizer_G']
+  optimizer_D_c = model_spec['optimizers']['optimizer_D_c']
+  optimizer_D_r = model_spec['optimizers']['optimizer_D_r']
+  optimizer_G_c = model_spec['optimizers']['optimizer_G_c']
+  optimizer_G_r = model_spec['optimizers']['optimizer_G_r']
 
   criterion_mse = model_spec['metrics']['MSE']
   criterion_ssim = model_spec['metrics']['SSIM']
   criterion_pp_acc = model_spec['metrics']['per_pixel_accuracy']
 
   # set model to training mode
-  model_G.train()
-  model_D.train()
+  model_G_c.train()
+  model_G_r.train()
+  model_D_c.train()
+  model_D_r.train()
 
   # summary for current training loop and a running average object for loss
   summ = []
-  average_loss_D = RunningAverage()
-  average_loss_G = RunningAverage()
+  average_loss_D_c = RunningAverage()
+  average_loss_G_c = RunningAverage()
+  average_loss_D_r = RunningAverage()
+  average_loss_G_r = RunningAverage()
   average_per_pixel_acc = RunningAverage()
   average_mse = RunningAverage()
   average_ssim = RunningAverage()
@@ -54,44 +84,57 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       batch_size = image_real.shape[0]
 
       # Discriminator ################################################################################################
-      model_D.zero_grad()
+      model_D_c.zero_grad()
+      model_D_r.zero_grad()
 
-      # real image
-      loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D', model_D,
-                                                                 criterion_D,
-                                                                 params.image_size, params.device)
-
-      # fake image
-      noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
-      fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
-      loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D,
-                                                      criterion_D, params.image_size,
-                                                      params.device)
-
-      # aggregate discriminator loss
-      loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+      # real image coarse
+      fake_coarse, loss_D_c, model_D_c, model_G_c, optimizer_D_c, confidence_D_c = get_discriminator_loss(image_real, image_masked, model_D_c, model_G_c, criterion_D, batch_size, optimizer_D_c, params)
 
       # update discriminator weights
-      loss_D.backward()
-      optimizer_D.step()
+      loss_D_c.backward()
+      optimizer_D_c.step()
+
+      coarse_image = fake_coarse.detach()
+      # real image refined
+      fake_refined, loss_D_r, model_D_r, model_G_r, optimizer_D_r, confidence_D_r = get_discriminator_loss(image_real, image_masked, model_D_r, model_G_r, criterion_D, batch_size, optimizer_D_r, params, coarse_image)
+
+      # update discriminator weights
+      loss_D_r.backward()
+      optimizer_D_r.step()
 
       # Generator ##################################################################################################
-      model_G.zero_grad()
-      loss_G_only, _ = get_discriminator_loss_conv(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G,
+      model_G_c.zero_grad()
+      model_G_r.zero_grad()
+
+      loss_G_c_only, _ = get_discriminator_loss_conv(fake_coarse, image_masked, params.patch_size, 'fake_G', model_D_c,
+                                                   criterion_G,
+                                                   params.image_size,
+                                                   params.device)
+
+      loss_G_r_only, _ = get_discriminator_loss_conv(fake_refined, image_masked, params.patch_size, 'fake_G', model_D_r, criterion_G,
                                                       params.image_size,
                                                       params.device)
 
-      loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
-      loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
+      loss_G_c_L1 = L1_criterion_G(fake_coarse, image_real)  # L1 loss beterrn fake and real images
+      loss_G_c = loss_G_c_only  * params.L1_lambda + loss_G_c_L1  # aggregated generator loss
 
       # update generator weights
-      loss_G.backward()
-      optimizer_G.step()
+      loss_G_c.backward()
+      optimizer_G_c.step()
+
+      loss_G_r_L1 = L1_criterion_G(fake_refined, image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
+      loss_G_r = loss_G_r_only + loss_G_r_L1  # aggregated generator loss
+
+      # update generator weights
+      loss_G_r.backward()
+      optimizer_G_r.step()
+
+
 
       # Metrics ####################################################################################################
       # extract data from torch Tensors, move to cpu
       batch_real = image_real.detach().data.cpu()
-      batch_fake = fake.detach().data.cpu()
+      batch_fake = fake_refined.detach().data.cpu()
 
       # Per Pixel Accuracy
       pp_accuracy = criterion_pp_acc(batch_real, batch_fake, params)
@@ -105,21 +148,23 @@ def train_session(model_spec, pipeline, epoch, writer, params):
       # Evaluate summaries only once in a while
       # if i % params.save_summary_steps == 0:
       # store per batch metrics for the epoch results
-      summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
+      summary_batch = {'loss_D_c': loss_D_c.item(), 'loss_D_r': loss_D_r.item(), 'loss_G_c': loss_G_c.item(), 'loss_G_r': loss_G_r.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
       summ.append(summary_batch)
 
       # update the average losses for both discriminator and generator
       # also update the metrics
       # this averages is only for visualisation in the progress bar
-      average_loss_D.update(loss_D.item())
-      average_loss_G.update(loss_G.item())
+      average_loss_D_c.update(loss_D_c.item())
+      average_loss_G_c.update(loss_G_c.item())
+      average_loss_D_r.update(loss_D_r.item())
+      average_loss_G_r.update(loss_G_r.item())
       average_per_pixel_acc.update(pp_accuracy)
       average_mse.update(mse.item())
       average_ssim.update(ssim.item())
 
       # Log the batch loss and accuracy in the tqdm progress bar
-      t.set_postfix(confidence_D='{:05.3f}'.format(confidence_D), loss_D='{:05.3f}'.format(average_loss_D()),
-                    loss_G='{:05.3f}'.format(average_loss_G()), pp_acc='{:05.3f}'.format(average_per_pixel_acc()),
+      t.set_postfix(confidence_D_r='{:05.3f}'.format(confidence_D_r), loss_D_r='{:05.3f}'.format(average_loss_D_r()),
+                    loss_G_r='{:05.3f}'.format(average_loss_G_r()), pp_acc='{:05.3f}'.format(average_per_pixel_acc()),
                     mse='{:05.3f}'.format(average_mse()), ssim='{:05.3f}'.format(average_ssim()))
 
       # 3 image grids
@@ -127,26 +172,30 @@ def train_session(model_spec, pipeline, epoch, writer, params):
         with torch.no_grad():
           # generate samples to display in evaluation mode
           noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
-          fake = model_G(image_masked, noise_tensor)
+          fake_coarse = model_G_c(image_masked, noise_tensor)
+          fake_refined = model_G_r(image_masked, fake_coarse)
 
           # unnormalize
           image_real = (image_real*0.5+0.5)
           image_masked = (image_masked * 0.5 + 0.5)
-          fake = (fake * 0.5 + 0.5)
+          fake_coarse = (fake_coarse * 0.5 + 0.5)
+          fake_refined = (fake_refined * 0.5 + 0.5)
 
           # create image grids for visualization
           img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
           img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
-          img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
+          img_grid_fake_c = torchvision.utils.make_grid(fake_coarse[:32], normalize=True, range=(0, 1))
+          img_grid_fake_r = torchvision.utils.make_grid(fake_refined[:32], normalize=True, range=(0, 1))
 
           # combine the grids
-          img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
+          img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake_c, img_grid_fake_r))
           torchvision.utils.save_image(img_grid_combined, os.path.join('outputs', f'{epoch}_{i}.jpg'))
 
           # write to tensorboard
           writer.add_image('Real_Images', img_grid_real)
           writer.add_image('Masked_Images', img_grid_masked)
-          writer.add_image('Fake_Images', img_grid_fake)
+          writer.add_image('Fake_Images', img_grid_fake_c)
+          writer.add_image('Fake_Images', img_grid_fake_r)
 
       t.update()
 

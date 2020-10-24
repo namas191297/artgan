@@ -48,35 +48,65 @@ def evaluate_session(model_spec, pipeline, writer, params):
         batch_size = image_real.shape[0]
 
         # Discriminator ################################################################################################
-        # real image
-        loss_D_real, confidence_D = get_discriminator_loss_conv(image_real, image_masked, params.patch_size, 'real_D',
-                                                                   model_D,
-                                                                   criterion_D,
-                                                                   params.image_size, params.device)
+        model_D_c.zero_grad()
+        model_D_r.zero_grad()
 
-        # fake image
-        noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
-        fake = model_G(image_masked, noise_tensor)  # generate fakes, given masked images
+        # real image coarse
+        fake_coarse, loss_D_c, model_D_c, model_G_c, optimizer_D_c, confidence_D_c = get_discriminator_loss(image_real,
+                                                                                                            image_masked,
+                                                                                                            model_D_c,
+                                                                                                            model_G_c,
+                                                                                                            criterion_D,
+                                                                                                            batch_size,
+                                                                                                            optimizer_D_c,
+                                                                                                            params)
 
-        loss_D_fake, _ = get_discriminator_loss_conv(fake.detach(), image_masked, params.patch_size, 'fake_D', model_D,
-                                                        criterion_D, params.image_size,
-                                                        params.device)
+        # update discriminator weights
+        loss_D_c.backward()
+        optimizer_D_c.step()
 
-        # aggregate discriminator loss
-        loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+        coarse_image = fake_coarse.detach()
+        # real image refined
+        fake_refined, loss_D_r, model_D_r, model_G_r, optimizer_D_r, confidence_D_r = get_discriminator_loss(image_real,
+                                                                                                             image_masked,
+                                                                                                             model_D_r,
+                                                                                                             model_G_r,
+                                                                                                             criterion_D,
+                                                                                                             batch_size,
+                                                                                                             optimizer_D_r,
+                                                                                                             params,
+                                                                                                             coarse_image)
+
+        # update discriminator weights
+        loss_D_r.backward()
+        optimizer_D_r.step()
 
         # Generator ##################################################################################################
-        loss_G_only, _ = get_discriminator_loss_conv(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G,
-                                                        params.image_size,
-                                                        params.device)
+        model_G_c.zero_grad()
+        model_G_r.zero_grad()
 
-        loss_G_L1 = L1_criterion_G(fake, image_real) * params.L1_lambda  # L1 loss between fake and real images
-        loss_G = loss_G_only + loss_G_L1  # aggregated generator loss
+        loss_G_c_only, _ = get_discriminator_loss_conv(fake_coarse, image_masked, params.patch_size, 'fake_G',
+                                                       model_D_c,
+                                                       criterion_G,
+                                                       params.image_size,
+                                                       params.device)
+
+        loss_G_r_only, _ = get_discriminator_loss_conv(fake_refined, image_masked, params.patch_size, 'fake_G',
+                                                       model_D_r, criterion_G,
+                                                       params.image_size,
+                                                       params.device)
+
+        loss_G_c_L1 = L1_criterion_G(fake_coarse, image_real)  # L1 loss beterrn fake and real images
+        loss_G_c = loss_G_c_only * params.L1_lambda + loss_G_c_L1  # aggregated generator loss
+
+        loss_G_r_L1 = L1_criterion_G(fake_refined,
+                                     image_real) * params.L1_lambda  # L1 loss beterrn fake and real images
+        loss_G_r = loss_G_r_only + loss_G_r_L1  # aggregated generator loss
 
         # Metrics ####################################################################################################
         # extract data from torch Tensors, move to cpu
-        batch_real = image_real.data.cpu()
-        batch_fake = fake.data.cpu()
+        batch_real = image_real.detach().data.cpu()
+        batch_fake = fake_refined.detach().data.cpu()
 
         # Per Pixel Accuracy
         pp_accuracy = criterion_pp_acc(batch_real, batch_fake, params)
@@ -90,45 +120,47 @@ def evaluate_session(model_spec, pipeline, writer, params):
         # Evaluate summaries only once in a while
         # if i % params.save_summary_steps == 0:
         # store per batch metrics for the epoch results
-        summary_batch = {'loss_D': loss_D.item(), 'loss_G': loss_G.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
+        summary_batch = {'loss_D_c': loss_D_c.item(), 'loss_D_r': loss_D_r.item(), 'loss_G_c': loss_G_c.item(),
+                         'loss_G_r': loss_G_r.item(), 'pp_acc': pp_accuracy, 'mse': mse.item(), 'ssim': ssim.item()}
         summ.append(summary_batch)
 
-        # update the average losses for both discriminator ang generator
-        average_loss_D.update(loss_D.item())
-        average_loss_G.update(loss_G.item())
+        # update the average losses for both discriminator and generator
+        # also update the metrics
+        # this averages is only for visualisation in the progress bar
+
         average_per_pixel_acc.update(pp_accuracy)
         average_mse.update(mse.item())
         average_ssim.update(ssim.item())
-
-        # Log the batch loss and accuracy in the tqdm progress bar
-        t.set_postfix(confidence_D='{:05.3f}'.format(confidence_D), loss_D='{:05.3f}'.format(average_loss_D()),
-                      loss_G='{:05.3f}'.format(average_loss_G()), pp_acc='{:05.3f}'.format(average_per_pixel_acc()),
-                      mse='{:05.3f}'.format(average_mse()), ssim='{:05.3f}'.format(average_ssim()))
 
         # 3 image grids
         if i % params.save_generated_img_steps == 0:
           with torch.no_grad():
             # generate samples to display in evaluation mode
             noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
-            fake = model_G(image_masked, noise_tensor)
+            fake_coarse = model_G_c(image_masked, noise_tensor)
+            fake_refined = model_G_r(image_masked, fake_coarse)
 
+            # unnormalize
             image_real = (image_real * 0.5 + 0.5)
             image_masked = (image_masked * 0.5 + 0.5)
-            fake = (fake * 0.5 + 0.5)
+            fake_coarse = (fake_coarse * 0.5 + 0.5)
+            fake_refined = (fake_refined * 0.5 + 0.5)
 
             # create image grids for visualization
             img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
             img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
-            img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
+            img_grid_fake_c = torchvision.utils.make_grid(fake_coarse[:32], normalize=True, range=(0, 1))
+            img_grid_fake_r = torchvision.utils.make_grid(fake_refined[:32], normalize=True, range=(0, 1))
 
             # combine the grids
-            img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
+            img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake_c, img_grid_fake_r))
             torchvision.utils.save_image(img_grid_combined, os.path.join('outputs', f'validation_{i}.jpg'))
 
             # write to tensorboard
             writer.add_image('Real_Images', img_grid_real)
             writer.add_image('Masked_Images', img_grid_masked)
-            writer.add_image('Fake_Images', img_grid_fake)
+            writer.add_image('Fake_Images', img_grid_fake_c)
+            writer.add_image('Fake_Images', img_grid_fake_r)
 
         t.update()
 

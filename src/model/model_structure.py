@@ -20,8 +20,12 @@ def model_fn(params):
 
   # model_D = Discriminator_256(params.num_channels, params.features_D).to(params.device)
   noise_tensor = get_random_noise_tensor(params.batch_size, params.num_channels, params.image_size, params)
-  model_D = get_discriminator(patch_size=params.patch_size, num_channels_input=params.num_channels, features_D=params.features_D).to(params.device)
-  model_G = CResUNet(params.num_channels, params.features_G, params.use_crelu, params.use_avgpool, num_dense_blocks=params.num_dense_blocks,
+  model_D_c = get_discriminator(patch_size=params.patch_size, num_channels_input=params.num_channels, features_D=params.features_D).to(params.device)
+  model_D_r = get_discriminator(patch_size=params.patch_size, num_channels_input=params.num_channels, features_D=params.features_D).to(params.device)
+  model_G_c = CResUNet(params.num_channels, params.features_G, params.use_crelu, params.use_avgpool, num_dense_blocks=params.num_dense_blocks,
+                     noise_tensor=noise_tensor).to(params.device)
+  model_G_r = CResUNet(params.num_channels, params.features_G, params.use_crelu, params.use_avgpool,
+                     num_dense_blocks=params.num_dense_blocks,
                      noise_tensor=noise_tensor).to(params.device)
 
   criterion_G = nn.BCELoss()
@@ -29,12 +33,14 @@ def model_fn(params):
 
   L1_criterion_G = nn.L1Loss()
 
-  optimizer_D = optim.Adam(model_D.parameters(), lr=params.lr_D, betas=(0.5, 0.999))
-  optimizer_G = optim.Adam(model_G.parameters(), lr=params.lr_G, betas=(0.5, 0.999))
+  optimizer_D_c = optim.Adam(model_D_c.parameters(), lr=params.lr_D, betas=(0.5, 0.999))
+  optimizer_D_r = optim.Adam(model_D_r.parameters(), lr=params.lr_D, betas=(0.5, 0.999))
+  optimizer_G_c = optim.Adam(model_G_c.parameters(), lr=params.lr_G, betas=(0.5, 0.999))
+  optimizer_G_r = optim.Adam(model_G_r.parameters(), lr=params.lr_G, betas=(0.5, 0.999))
 
-  models = {'model_D': model_D, 'model_G': model_G}
+  models = {'model_D_c': model_D_c,'model_D_r': model_D_r, 'model_G_c': model_G_c, 'model_G_r': model_G_r}
   losses = {'criterion_G': criterion_G, 'criterion_D': criterion_D, 'L1_criterion_G': L1_criterion_G}
-  optimizers = {'optimizer_D': optimizer_D, 'optimizer_G': optimizer_G}
+  optimizers = {'optimizer_D_c': optimizer_D_c,'optimizer_D_r': optimizer_D_r, 'optimizer_G_c': optimizer_G_c, 'optimizer_G_r': optimizer_G_r}
 
   metrics = {'MSE': nn.MSELoss(), 'SSIM': SSIM(), 'per_pixel_accuracy': per_pixel_accuracy, 'PSNR': psnr}
 

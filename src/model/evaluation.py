@@ -63,7 +63,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
                                                         params.device)
 
         # aggregate discriminator loss
-        loss_D = (loss_D_real + (1-loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+        loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
 
         # Generator ##################################################################################################
         loss_G_only, _ = get_discriminator_loss_conv(fake, image_masked, params.patch_size, 'fake_G', model_D, criterion_G,

@@ -69,7 +69,7 @@ def train_session(model_spec, pipeline, epoch, writer, params):
                                                       params.device)
 
       # aggregate discriminator loss
-      loss_D = (loss_D_real + (1-loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
+      loss_D = (loss_D_real + (loss_D_fake)) * params.loss_D_factor  # multiplied by 0.5 to slow down discriminator's learning
 
       # update discriminator weights
       loss_D.backward()

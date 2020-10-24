@@ -28,9 +28,9 @@ def main():
     params.device = torch.device('cpu')
 
   # Set a seed for reproducible experiments
-  torch.manual_seed(141)
+  torch.manual_seed(564)
   if params.cuda:
-    torch.cuda.manual_seed(141)
+    torch.cuda.manual_seed(564)
 
   # Set the training logger for updates
   set_logger(os.path.join(args.model_dir, 'train.log'))

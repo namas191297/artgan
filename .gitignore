@@ -1,0 +1,4 @@
+# Default ignored files
+/.idea
+/src/model/__pycache__
+/src/experiments

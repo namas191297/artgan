@@ -158,11 +158,10 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   # Reload weights from the saved file
   test_writer = SummaryWriter(os.path.join(model_dir, 'test_summaries'))
 
-  checkpoint = os.path.join(model_dir, restore_from)
-  if not os.path.exists(checkpoint):
-    raise ("File doesn't exist {}".format(checkpoint))
+  if not os.path.exists(restore_from):
+    raise FileNotFoundError("File doesn't exist {}".format(restore_from))
 
-  checkpoint = torch.load(checkpoint)
+  checkpoint = torch.load(restore_from)
   model_spec['models']['model_G'].load_state_dict(checkpoint['G_state_dict'])
   model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
 

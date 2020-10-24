@@ -181,11 +181,10 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
   :param params: (Params), contains hyper-parameters of the model. Must define: num_epochs, batch_size, save_summary_steps, ... etc
   """
   if restore_from is not None:
-    checkpoint = os.path.join(model_dir, restore_from)
-    if not os.path.exists(checkpoint):
-      raise ("File {} doesn't exist".format(checkpoint))
+    if not os.path.exists(restore_from):
+      raise FileNotFoundError("File {} doesn't exist".format(restore_from))
 
-    checkpoint = torch.load(checkpoint)
+    checkpoint = torch.load(restore_from)
 
     model_spec['models']['model_G'].load_state_dict(checkpoint['G_state_dict'])
     model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
@@ -231,7 +230,7 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
 
       save_checkpoint_and_weights(model_dir, save_dict, epoch, valid_mean_metrics, checkpoint='best')
 
-      logging.info("Found new best accuracy, saving in {}".format(best_save_path))
+      logging.info("Found new best accuracy, after epoch {}".format(epoch + 1))
 
     save_checkpoint_and_weights(model_dir, save_dict, epoch, valid_mean_metrics, checkpoint='last')
 

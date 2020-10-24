@@ -174,7 +174,6 @@ def train_session(model_spec, pipeline, epoch, writer, params):
           writer.add_image('Fake_Images', img_grid_fake_r)
 
       t.update()
-
   # compute mean of all metrics in summary
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
@@ -216,7 +215,7 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
     for k, v in valid_mean_metrics.items():
       eval_writer.add_scalar(k, v, global_step=epoch + 1)
 
-    valid_loss_G = valid_mean_metrics['loss_G']
+    valid_loss_G = valid_mean_metrics['loss_G_r']
 
     if valid_loss_G <= best_valid_loss_G:
       # Store new best loss
@@ -233,10 +232,14 @@ def train_and_validate(model_spec, train_pipeline, valid_pipeline, model_dir, pa
       best_save_path = os.path.join(best_save_directory, 'best_after_epoch_{}.pth.tar'.format(epoch + 1))
 
       torch.save({'epoch': epoch + 1,
-                  'G_state_dict': model_spec['models']['model_G'].state_dict(),
-                  'G_optim_dict': model_spec['optimizers']['optimizer_G'].state_dict(),
-                  'D_state_dict': model_spec['models']['model_D'].state_dict(),
-                  'D_optim_dict': model_spec['optimizers']['optimizer_D'].state_dict()},
+                  'G_c_state_dict': model_spec['models']['model_G_c'].state_dict(),
+                  'G_r_state_dict': model_spec['models']['model_G_r'].state_dict(),
+                  'G_c_optim_dict': model_spec['optimizers']['optimizer_G_c'].state_dict(),
+                  'G_r_optim_dict': model_spec['optimizers']['optimizer_G_r'].state_dict(),
+                  'D_c_state_dict': model_spec['models']['model_D_c'].state_dict(),
+                  'D_r_state_dict': model_spec['models']['model_D_r'].state_dict(),
+                  'D_c_optim_dict': model_spec['optimizers']['optimizer_D_c'].state_dict(),
+                  'D_r_optim_dict': model_spec['optimizers']['optimizer_D_c'].state_dict()},
                  best_save_path)
 
       logging.info("Found new best accuracy, saving in {}".format(best_save_path))

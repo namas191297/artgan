@@ -5,7 +5,7 @@
   "features_D": 64,
   "features_G": 64,
   "L1_lambda": 100,
-  "batch_size": 8,
+  "batch_size": 24,
   "num_epochs": 50,
   "image_size": 224,
   "num_channels": 3,

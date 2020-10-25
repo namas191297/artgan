@@ -2,7 +2,7 @@ import json
 import logging
 import torch
 import os
-
+import cv2
 
 class Params:
   """
@@ -206,3 +206,12 @@ def create_output_folder():
   output_path = 'outputs'
   if not os.path.exists(output_path):
     os.makedirs(output_path)
+
+def save_image_batch(tensor_batch, i):
+  inference_dir = 'output_test'
+  if not os.path.exists(inference_dir):
+    os.makedirs(inference_dir)
+  for index in len(tensor_batch):
+    image = tensor_batch[index].detach().cpu().permute(1, 2, 0)
+    image = cv2.resize(image, (299, 299), interpolation='')
+    cv2.imsave(os.path.join(inference_dir, f'{i}_{index}.jpg'))

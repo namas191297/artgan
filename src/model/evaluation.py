@@ -110,7 +110,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
                       mse='{:05.3f}'.format(average_mse()), ssim='{:05.3f}'.format(average_ssim()))
 
         # 3 image grids
-        if i % params.save_generated_img_steps == 0:
+        if i % 1 == 0:
           with torch.no_grad():
             # generate samples to display in evaluation mode
             noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
@@ -124,6 +124,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
             img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
             img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
             img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
+
 
             # combine the grids
             img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
@@ -161,7 +162,7 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   if not os.path.exists(restore_from):
     raise FileNotFoundError("File doesn't exist {}".format(restore_from))
 
-  checkpoint = torch.load(restore_from)
+  checkpoint = torch.load(restore_from, map_location='cpu')
   model_spec['models']['model_G'].load_state_dict(checkpoint['G_state_dict'])
   model_spec['models']['model_D'].load_state_dict(checkpoint['D_state_dict'])
 

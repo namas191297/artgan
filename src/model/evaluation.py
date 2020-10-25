@@ -176,5 +176,5 @@ def evaluate(model_spec, pipeline, model_dir, params, restore_from):
   test_writer.flush()
   test_writer.close()
 
-  save_path = os.path.join(model_dir, "metrics_test_{}.json".format(restore_from))
+  save_path = os.path.join(model_dir, "metrics_test_best.json")
   save_dict_to_json(test_metrics, save_path)

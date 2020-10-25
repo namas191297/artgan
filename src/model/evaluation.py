@@ -118,6 +118,9 @@ def evaluate_session(model_spec, pipeline, writer, params):
             noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
             fake = model_G(image_masked, noise_tensor)
 
+            frechet_distance = compute_frechet_distance(image_real, fake)
+            print(f'frechet_distance: {frechet_distance}')
+
             image_real = (image_real * 0.5 + 0.5)
             image_masked = (image_masked * 0.5 + 0.5)
             fake = (fake * 0.5 + 0.5)
@@ -128,8 +131,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
             img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
             save_image_batch(image_real, i, 'real')
             save_image_batch(fake, i, 'fake')
-            frechet_distance = compute_frechet_distance(image_real, fake)
-            print(f'frechet_distance: {frechet_distance}')
+
 
             # combine the grids
             img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))

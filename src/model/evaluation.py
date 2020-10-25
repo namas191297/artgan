@@ -5,6 +5,8 @@ import torch
 import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+from model.utils import save_image_batch
+from fid import compute_frechet_distance
 
 from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, \
   get_discriminator_loss_conv
@@ -124,7 +126,10 @@ def evaluate_session(model_spec, pipeline, writer, params):
             img_grid_real = torchvision.utils.make_grid(image_real[:32], normalize=True, range=(0, 1))
             img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
             img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
-
+            save_image_batch(image_real, i, 'real')
+            save_image_batch(fake, i, 'fake')
+            frechet_distance = compute_frechet_distance(image_real, fake)
+            print(f'frechet_distance: {frechet_distance}')
 
             # combine the grids
             img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))

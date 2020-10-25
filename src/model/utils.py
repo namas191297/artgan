@@ -3,6 +3,7 @@ import logging
 import torch
 import os
 import cv2
+import numpy as np
 
 class Params:
   """
@@ -207,11 +208,13 @@ def create_output_folder():
   if not os.path.exists(output_path):
     os.makedirs(output_path)
 
-def save_image_batch(tensor_batch, i):
+def save_image_batch(tensor_batch, i, mode=''):
   inference_dir = 'output_test'
   if not os.path.exists(inference_dir):
     os.makedirs(inference_dir)
-  for index in len(tensor_batch):
-    image = tensor_batch[index].detach().cpu().permute(1, 2, 0)
-    image = cv2.resize(image, (299, 299), interpolation='')
-    cv2.imsave(os.path.join(inference_dir, f'{i}_{index}.jpg'))
+  for index in range(len(tensor_batch)):
+    image = tensor_batch[index].detach().cpu().permute(1, 2, 0).numpy()
+    image = convert(image, 0, 255, np.uint8)
+    image = cv2.resize(image, (299, 299), interpolation=cv2.INTER_LANCZOS4)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(os.path.join(inference_dir, f'{mode}_{i}_{index}.jpg'), image)

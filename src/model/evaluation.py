@@ -6,7 +6,8 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from model.utils import save_image_batch
-from fid import compute_frechet_distance
+from fid import get_inception_features
+import pickle
 
 from model.utils import save_dict_to_json, get_random_noise_tensor, get_discriminator_loss_strided, \
   get_discriminator_loss_conv
@@ -42,6 +43,9 @@ def evaluate_session(model_spec, pipeline, writer, params):
   average_mse = RunningAverage()
   average_ssim = RunningAverage()
   logging.info("Evaluation Session Running...")
+
+  frechet_real = []
+  frechet_fake = []
   # torch.no_grad() to remove the training effect of BatchNorm in this case as it evaluates the model
   with torch.no_grad():
     with tqdm(total=len(pipeline)) as t:
@@ -118,8 +122,10 @@ def evaluate_session(model_spec, pipeline, writer, params):
             noise_tensor = get_random_noise_tensor(batch_size, params.num_channels, params.image_size, params)
             fake = model_G(image_masked, noise_tensor)
 
-            frechet_distance = compute_frechet_distance(image_real, fake)
-            print(f'frechet_distance: {frechet_distance}')
+            reals, fakes = get_inception_features(image_real, fake)
+            frechet_real.append(reals.numpy())
+            frechet_fake.append(fakes.numpy())
+            # print(f'frechet_distance: {frechet_distance}')
 
             image_real = (image_real * 0.5 + 0.5)
             image_masked = (image_masked * 0.5 + 0.5)
@@ -130,6 +136,7 @@ def evaluate_session(model_spec, pipeline, writer, params):
             img_grid_masked = torchvision.utils.make_grid(image_masked[:32], normalize=True, range=(0, 1))
             img_grid_fake = torchvision.utils.make_grid(fake[:32], normalize=True, range=(0, 1))
             save_image_batch(image_real, i, 'real')
+            save_image_batch(image_masked, i, 'masked')
             save_image_batch(fake, i, 'fake')
 
 
@@ -143,6 +150,9 @@ def evaluate_session(model_spec, pipeline, writer, params):
             writer.add_image('Fake_Images', img_grid_fake)
 
         t.update()
+
+  with open('frehcet.pkl', 'wb') as f:
+    pickle.dump([frechet_real, frechet_fake], f)
 
   metrics_mean = {metric: np.mean([x[metric] for x in summ]) for metric in summ[0]}
   metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())

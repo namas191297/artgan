@@ -4,22 +4,25 @@ import torch
 from scipy import linalg
 
 with open('frehcet.pkl', 'rb') as f:
-    frechet_real, frechet_fake = pickle.load(f)
+  frechet_real, frechet_fake = pickle.load(f)
+
 
 def cov(x):
-    return np.cov(x, rowvar=False)
+  return np.cov(x, rowvar=False)
+
 
 def matsqrt(img):
-    data = img.cpu().detach().numpy()
-    data = linalg.sqrtm(data).real
-    return torch.Tensor(data, device='cpu')
+  data = img.cpu().detach().numpy()
+  data = linalg.sqrtm(data).real
+  return torch.Tensor(data, device='cpu')
+
 
 def frechet_distance(mean_real, mean_fake, sigma_real, sigma_fake):
-    mean_real = torch.tensor(mean_real)
-    mean_fake = torch.tensor(mean_fake)
-    sigma_real = torch.tensor(sigma_real)
-    sigma_fake = torch.tensor(sigma_fake)
-    return (torch.norm(mean_real - mean_fake) ** 2) +  torch.trace(sigma_real + sigma_fake - (2 * matsqrt(sigma_real @ sigma_fake)))
+  mean_real = torch.tensor(mean_real)
+  mean_fake = torch.tensor(mean_fake)
+  sigma_real = torch.tensor(sigma_real)
+  sigma_fake = torch.tensor(sigma_fake)
+  return (torch.norm(mean_real - mean_fake) ** 2) + torch.trace(sigma_real + sigma_fake - (2 * matsqrt(sigma_real @ sigma_fake)))
 
 
 reals_list = []

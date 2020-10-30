@@ -19,6 +19,9 @@ These folders must exist in advance, as of this version of the code.
     - train
     - test
     - validation
+    
+** Note that this script will create ethe ArtNet from both image restoration and style transfer learning. To only keep the art restoration
+comment out the parts of code of which are sectioned as `B`
 '''
 parent_path = '../../../Dataset/'
 cezanne_path = os.path.join(parent_path, 'cezanne2photo')

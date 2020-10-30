@@ -9,13 +9,11 @@ import cv2
 import random
 
 train_transform = transforms.Compose([
-  # transforms.ColorJitter(brightness=[1, 2], contrast=[0.5, 1]),
   transforms.RandomRotation(10),
   transforms.Resize((256, 256)),
   transforms.RandomCrop((224, 224)),
   transforms.ToTensor(),
   transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-  # transforms.ToPILImage()
 ])
 
 mask_transform = transforms.Compose([
@@ -26,7 +24,6 @@ eval_transform = transforms.Compose([
   transforms.Resize((224, 224)),
   transforms.ToTensor(),
   transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-  # transforms.ToPILImage()
 ])
 
 
@@ -44,7 +41,9 @@ class ArtNetDataset(torch.utils.data.Dataset):
 
     # Initialize transformations that need to be applied on the dataset
     self.train_transform = train_transform
+    # No need for mask transform at this stage
     self.mask_transform = mask_transform
+
     self.eval_transform = eval_transform
 
     self.toTensor = transforms.ToTensor()
@@ -77,7 +76,6 @@ class ArtNetDataset(torch.utils.data.Dataset):
     mask_width = mask_sizes[mask_size[0]][1]
     dim = mask_sizes[mask_size[0]]
 
-    # mask = np.array(Image.open(mask_path).resize(dim))
     mask = cv2.imread(mask_path, cv2.IMREAD_UNCHANGED)
 
     alpha = mask[:, :, 3]  # extract it
@@ -85,8 +83,6 @@ class ArtNetDataset(torch.utils.data.Dataset):
       mask = alpha
     else:
       mask = 255 - alpha  # invert b/w
-    # cv2.imshow("P", binary)
-    # cv2.waitKey()
 
     mask = cv2.resize(mask, dim, interpolation=cv2.INTER_AREA)
 
@@ -99,17 +95,6 @@ class ArtNetDataset(torch.utils.data.Dataset):
     range_y_start = rand_y
     range_y_end = rand_y + mask_width
 
-    # import matplotlib.pyplot as plt
-    # plt.figure(figsize=(10, 10))
-    # plt.imshow(mask, cmap='gray')
-    # plt.show()
-
-    # plt.figure(figsize=(10, 10))
-    # plt.imshow(alpha, cmap='gray')
-    # plt.show()
-
-    # res = cv2.bitwise_and(img, img)
-    # mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
     w, h = mask.shape
     mask_rgb = np.empty((w, h, 3), dtype=np.uint8)
     mask_rgb[:, :, 2] = mask_rgb[:, :, 1] = mask_rgb[:, :, 0] = mask
@@ -127,27 +112,9 @@ class ArtNetDataset(torch.utils.data.Dataset):
                                                                                                        :],
                                                                                        convert(mask_rgb, -1, 1,
                                                                                                np.float32))
-    # masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 0], convert(mask, -1, 1, np.float32))
-    # masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 1], convert(mask, -1, 1, np.float32))
-    # masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2] = np.where(mask>10, masked_image[range_x_start:range_x_end, range_y_start:range_y_end, 2], convert(mask, -1, 1, np.float32))
 
-    # plt.figure(figsize=(10, 10))
-    # plt.imshow(masked_image * 0.5 + 0.5)
-    # plt.show()
-
-    # print(mask)
-    # random_x = self.random_coord(masked_image)
-    # random_y = self.random_coord(masked_image)
-
-    #
-    # mask = Image.open(mask_path).resize(self.mask_sizes[mask_size[0]])
-    # mask = self.mask_transform(mask)
-    # # generate random coordinates and paste the mask on the real image
-
-    # masked_image.paste(mask, (random_x, random_y), mask)
     masked_image = transforms.ToTensor()(masked_image)
-    # masked_image = transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])(masked_image)
-    # masked_image = (masked_image / 0.5) - 1
+
     return masked_image
 
   def random_coord(self, image):

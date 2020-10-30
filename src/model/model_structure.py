@@ -10,6 +10,7 @@ from model.generator import CResUNet
 from model.utils import get_random_noise_tensor, convert
 import numpy as np
 
+
 def model_fn(params):
   """
   Model function defining the graph operations
@@ -46,8 +47,8 @@ def model_fn(params):
   return model_spec
 
 
+# Function deprecated;
 def per_pixel_accuracy(real, generated, params):
-  # Todo convert to range
   total_pixels = 0
   total_pixels += real.nelement()
 
@@ -57,8 +58,7 @@ def per_pixel_accuracy(real, generated, params):
   distance = real - generated
   threshold = params.threshold_pp_acc
 
-  correct_pixels = np.sum(np.where((real - generated)<1, 1, 0))
-  # correct_pixels = np.sum(np.where(, torch.tensor(1), torch.tensor(0))).item()
+  correct_pixels = np.sum(np.where((real - generated) < 1, 1, 0))
 
   pp_acc = correct_pixels / total_pixels
   return pp_acc
@@ -125,25 +125,7 @@ class SSIM(torch.nn.Module):
     return _ssim(img1, img2, window, self.window_size, channel, self.size_average)
 
 
-# def ssim(img1, img2, window_size=11, size_average=True):
-#   (_, channel, _, _) = img1.size()
-#   window = create_window(window_size, channel)
-#
-#   if img1.is_cuda:
-#     window = window.cuda(img1.get_device())
-#   window = window.type_as(img1)
-#
-#   return _ssim(img1, img2, window, window_size, channel, size_average)
-#
-#
-# def batch_ssim(real, predicted):
-#   loss = []
-#   _, channel, h, w = real.size()
-#   for i in range(real.shape[0]):
-#     loss.append(ssim(real[i].reshape(1, channel, h, w), predicted[i].reshape(1, channel, h, w)))
-#   return sum(loss) / len(loss)
-#
-#
+# Function Not Implemented yet
 def psnr(real, fake, mse_loss=None):
   """"
   mse_loss is a 1D array/list of per image MSE for the batch (can be reused if calculated earlier)
@@ -158,9 +140,10 @@ def psnr(real, fake, mse_loss=None):
       mse_loss.append(mse(real[i], fake[i]))
 
   for i in range(real.size(0)):
-    psnrs.append(math.log((255**2)/mse_loss[i], 10))
+    psnrs.append(math.log((255 ** 2) / mse_loss[i], 10))
 
-  return sum(psnrs)/len(psnrs)
+  return sum(psnrs) / len(psnrs)
+
 
 class RunningAverage:
   """

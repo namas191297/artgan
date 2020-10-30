@@ -139,7 +139,6 @@ def evaluate_session(model_spec, pipeline, writer, params):
             save_image_batch(image_masked, i, 'masked')
             save_image_batch(fake, i, 'fake')
 
-
             # combine the grids
             img_grid_combined = torch.stack((img_grid_real, img_grid_masked, img_grid_fake))
             torchvision.utils.save_image(img_grid_combined, os.path.join('outputs', f'validation_{i}.jpg'))

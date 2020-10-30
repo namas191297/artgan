@@ -5,6 +5,7 @@ import os
 import cv2
 import numpy as np
 
+
 class Params:
   """
   Class that loads hyper-parameters from a json file
@@ -207,6 +208,7 @@ def create_output_folder():
   output_path = 'outputs'
   if not os.path.exists(output_path):
     os.makedirs(output_path)
+
 
 def save_image_batch(tensor_batch, i, mode=''):
   inference_dir = 'output_test'

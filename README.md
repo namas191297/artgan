@@ -1,5 +1,13 @@
 # ArtGAN: Artwork Restoration using Generative Adversarial Networks
 
+* To install dependences:
+
+<p> Ideally create a new conda enviroment with python==3.6</p>
+<p> Then install a GPU-enabled pytorch==1.6.0, torchvision=0.7.0</p>
+<p> Finally from the conda env, run the extra dependencies if they are not already satified</p>
+<code> pip install -r pip_requirements.txt</code>  
+<p></p>
+
 * To train and validate the model per epoch run:
 
 <code> python train.py --model_dir=experiments/base_model --data_dir=/path/to/Dataset </code>

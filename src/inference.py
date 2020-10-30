@@ -11,7 +11,7 @@ from model.evaluation import evaluate
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', type=str, default='experiments/base_model/', help='Experiment directory containing params.json')
 parser.add_argument('--data_dir', type=str, default='../../Dataset/ArtNet/', help='Directory containing the dataset')
-parser.add_argument('--restore_from', type=str, default='experiments/base_model/best_weights/best_after_epoch_163.pth.tar',
+parser.add_argument('--restore_from', type=str, default='experiments/best_model/best_weights/best_after_epoch_163.pth.tar',
                     help='Optional, file containing weights to reload before training')
 
 

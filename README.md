@@ -22,3 +22,8 @@
 
 <p>Change the `/path/to/Dataset` to the correct path of the ArtNet</p>
 <p>Change the `/path/to/best_weights/checkpoint.pth.tar` to the correct path of the pre-trained checkpoint (the default value is `experiments/best_model/best_weights/best_after_epoch_163.pth.tar`)</p>
+
+
+Finally, if you used any of the ARTGAN code, please cite the following paper:
+
+"A. Adhikary, N. Bhandari, E. Markou and S. Sachan, "ArtGAN: Artwork Restoration using Generative Adversarial Networks," 2021 13th International Conference on Advanced Computational Intelligence (ICACI), 2021, pp. 199-206, doi: 10.1109/ICACI52617.2021.9435888."
